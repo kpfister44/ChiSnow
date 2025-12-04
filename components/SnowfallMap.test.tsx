@@ -15,6 +15,6 @@ describe('SnowfallMap', () => {
   it('map container fills the entire viewport', () => {
     render(<SnowfallMap />);
     const mapContainer = screen.getByTestId('map-container');
-    expect(mapContainer).toHaveClass('w-full', 'h-screen');
+    expect(mapContainer).toHaveClass('w-full', 'h-full');
   });
 });
