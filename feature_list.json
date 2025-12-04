@@ -1,0 +1,1429 @@
+[
+  {
+    "category": "functional",
+    "description": "Initial page load displays map centered on Chicagoland area with latest snowfall data",
+    "steps": [
+      "Step 1: Navigate to the ChiSnow homepage",
+      "Step 2: Verify page loads within 2 seconds",
+      "Step 3: Verify map is centered on Chicago (approximately lat: 41.8781, lon: -87.6298)",
+      "Step 4: Verify snowfall data is visible on the map",
+      "Step 5: Verify heatmap layer is displayed by default",
+      "Step 6: Verify markers are displayed by default",
+      "Step 7: Verify storm selector shows most recent storm",
+      "Step 8: Verify no error messages are displayed",
+      "Step 9: Verify loading states complete successfully",
+      "Step 10: Verify map is interactive (can pan and zoom)"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "API route /api/snowfall/latest returns correct data format",
+    "steps": [
+      "Step 1: Make GET request to /api/snowfall/latest",
+      "Step 2: Verify response status is 200",
+      "Step 3: Verify response contains stormId field",
+      "Step 4: Verify response contains date field in ISO format",
+      "Step 5: Verify response contains measurements array",
+      "Step 6: Verify each measurement has lat, lon, amount, source, station, timestamp fields",
+      "Step 7: Verify source field is one of: NOAA_NWS, NOAA_GRIDDED, or COCORAHS"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "API route /api/storms returns list of recent storms",
+    "steps": [
+      "Step 1: Make GET request to /api/storms",
+      "Step 2: Verify response status is 200",
+      "Step 3: Verify response is an array",
+      "Step 4: Verify array contains 5-10 storm objects",
+      "Step 5: Verify each storm has id, date, totalStations, maxSnowfall fields",
+      "Step 6: Verify storms are ordered by date (most recent first)"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "API route /api/snowfall/[stormId] returns specific storm data",
+    "steps": [
+      "Step 1: Get a valid stormId from /api/storms",
+      "Step 2: Make GET request to /api/snowfall/[stormId]",
+      "Step 3: Verify response status is 200",
+      "Step 4: Verify response matches the same format as /api/snowfall/latest",
+      "Step 5: Verify stormId in response matches requested stormId"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "API routes implement 2-hour caching to reduce external API calls",
+    "steps": [
+      "Step 1: Make first request to /api/snowfall/latest",
+      "Step 2: Record response time",
+      "Step 3: Make second request to /api/snowfall/latest within 2 hours",
+      "Step 4: Verify second request is faster (cached)",
+      "Step 5: Verify response data is identical",
+      "Step 6: Wait 2+ hours and make third request",
+      "Step 7: Verify cache has expired and fresh data is fetched"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Heatmap layer displays snowfall gradient from light blue to purple",
+    "steps": [
+      "Step 1: Navigate to homepage with snowfall data",
+      "Step 2: Verify heatmap layer is visible on map",
+      "Step 3: Verify areas with 0-2 inches show light blue (#DBEAFE)",
+      "Step 4: Verify areas with 2-4 inches show medium blue (#60A5FA)",
+      "Step 5: Verify areas with 4-6 inches show deep blue (#2563EB)",
+      "Step 6: Verify areas with 6-10 inches show dark blue (#1E40AF)",
+      "Step 7: Verify areas with 10+ inches show purple (#7C3AED)",
+      "Step 8: Verify smooth color transitions between amounts"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Markers display on map with color-coding based on snowfall amount",
+    "steps": [
+      "Step 1: Navigate to homepage",
+      "Step 2: Verify markers are visible on map",
+      "Step 3: Verify markers show snowfall amounts inside",
+      "Step 4: Verify marker colors match snowfall gradient",
+      "Step 5: Verify markers are circular pins",
+      "Step 6: Verify white text is readable on colored background"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Clicking a marker displays station details in popup/bottom sheet",
+    "steps": [
+      "Step 1: Navigate to homepage",
+      "Step 2: Click on a marker on the map",
+      "Step 3: Verify popup or bottom sheet appears",
+      "Step 4: Verify station name is displayed",
+      "Step 5: Verify exact snowfall amount is displayed",
+      "Step 6: Verify data source is displayed (NOAA NWS, NOAA Gridded, etc)",
+      "Step 7: Verify measurement timestamp is displayed",
+      "Step 8: Verify location information is shown",
+      "Step 9: On mobile: verify bottom sheet slides up smoothly",
+      "Step 10: On desktop: verify popup appears above marker",
+      "Step 11: Verify can dismiss popup/bottom sheet by clicking outside",
+      "Step 12: On mobile: verify can dismiss by swiping down"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Marker clustering reduces clutter when zoomed out",
+    "steps": [
+      "Step 1: Navigate to homepage",
+      "Step 2: Zoom out to view large area",
+      "Step 3: Verify nearby markers cluster together",
+      "Step 4: Verify cluster marker shows count badge",
+      "Step 5: Zoom in on a cluster",
+      "Step 6: Verify cluster expands into individual markers",
+      "Step 7: Verify smooth animation during cluster expansion"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Toggle controls switch between heatmap, markers, and both visualizations",
+    "steps": [
+      "Step 1: Navigate to homepage with both layers visible",
+      "Step 2: Click 'Heatmap' toggle button",
+      "Step 3: Verify only heatmap is visible, markers are hidden",
+      "Step 4: Verify button shows active state",
+      "Step 5: Click 'Markers' toggle button",
+      "Step 6: Verify only markers are visible, heatmap is hidden",
+      "Step 7: Verify button shows active state",
+      "Step 8: Click 'Both' toggle button",
+      "Step 9: Verify both heatmap and markers are visible",
+      "Step 10: Verify button shows active state",
+      "Step 11: Verify smooth fade transitions (300ms) between states"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Map pan and zoom controls work correctly",
+    "steps": [
+      "Step 1: Navigate to homepage",
+      "Step 2: Click and drag to pan the map",
+      "Step 3: Verify map moves in the direction of drag",
+      "Step 4: Use scroll wheel to zoom in",
+      "Step 5: Verify map zooms in smoothly",
+      "Step 6: Use scroll wheel to zoom out",
+      "Step 7: Verify map zooms out smoothly",
+      "Step 8: On mobile: use pinch gesture to zoom",
+      "Step 9: Verify pinch zoom works correctly",
+      "Step 10: Double-tap on map",
+      "Step 11: Verify map zooms in on tap location"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Reset to Chicago button re-centers map on Chicagoland area",
+    "steps": [
+      "Step 1: Navigate to homepage",
+      "Step 2: Pan map away from Chicago",
+      "Step 3: Click 'Reset to Chicago' button",
+      "Step 4: Verify map smoothly animates back to Chicago",
+      "Step 5: Verify map is centered on Chicagoland area",
+      "Step 6: Verify zoom level is reset to default"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Storm selector dropdown displays list of recent storms",
+    "steps": [
+      "Step 1: Navigate to homepage",
+      "Step 2: Locate storm selector dropdown",
+      "Step 3: Click to open dropdown",
+      "Step 4: Verify dropdown expands smoothly",
+      "Step 5: Verify list shows 5-10 recent storms",
+      "Step 6: Verify each storm shows date",
+      "Step 7: Verify each storm shows max snowfall preview",
+      "Step 8: Verify current storm is indicated/highlighted",
+      "Step 9: Verify storms are ordered by date (most recent first)"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Selecting a different storm updates map data",
+    "steps": [
+      "Step 1: Navigate to homepage showing latest storm",
+      "Step 2: Open storm selector dropdown",
+      "Step 3: Select a different historical storm",
+      "Step 4: Verify loading indicator appears briefly",
+      "Step 5: Verify map data updates with new storm measurements",
+      "Step 6: Verify heatmap reflects new data",
+      "Step 7: Verify markers reflect new data",
+      "Step 8: Verify smooth transition between data sets",
+      "Step 9: Verify storm selector shows newly selected storm",
+      "Step 10: Verify map re-centers if storm has different focus area"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Toggle state persists when switching between storms",
+    "steps": [
+      "Step 1: Navigate to homepage",
+      "Step 2: Set visualization to 'Markers only'",
+      "Step 3: Switch to a different storm",
+      "Step 4: Verify visualization remains 'Markers only'",
+      "Step 5: Switch back to original storm",
+      "Step 6: Verify visualization is still 'Markers only'"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "API gracefully handles failures from external weather APIs",
+    "steps": [
+      "Step 1: Simulate NOAA API being unavailable",
+      "Step 2: Make request to /api/snowfall/latest",
+      "Step 3: Verify appropriate error response is returned",
+      "Step 4: Verify error message is user-friendly",
+      "Step 5: Navigate to homepage during API failure",
+      "Step 6: Verify error state is displayed to user",
+      "Step 7: Verify error state suggests trying again later",
+      "Step 8: Verify app doesn't crash or show blank screen"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Loading states display during data fetch operations",
+    "steps": [
+      "Step 1: Navigate to homepage",
+      "Step 2: Verify loading spinner shows during initial data fetch",
+      "Step 3: Verify skeleton loaders show for map content",
+      "Step 4: Switch to different storm",
+      "Step 5: Verify loading indicator appears during transition",
+      "Step 6: Verify loading states complete when data is ready",
+      "Step 7: Verify no loading artifacts remain after completion"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "App works with cached data when offline",
+    "steps": [
+      "Step 1: Navigate to homepage and load data",
+      "Step 2: Verify data loads successfully",
+      "Step 3: Disconnect from network",
+      "Step 4: Refresh page",
+      "Step 5: Verify cached data is displayed",
+      "Step 6: Verify basic functionality works with cache",
+      "Step 7: Verify appropriate message indicates offline mode"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Data normalization combines multiple sources into unified format",
+    "steps": [
+      "Step 1: Fetch data from /api/snowfall/latest",
+      "Step 2: Verify measurements from NOAA NWS are included",
+      "Step 3: Verify measurements from NOAA Gridded are included",
+      "Step 4: Verify all measurements follow same data structure",
+      "Step 5: Verify source field correctly identifies data origin",
+      "Step 6: Verify coordinates are normalized to consistent format",
+      "Step 7: Verify timestamps are normalized to ISO format"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Map supports pan across entire United States",
+    "steps": [
+      "Step 1: Navigate to homepage",
+      "Step 2: Pan map to West Coast",
+      "Step 3: Verify map displays correctly",
+      "Step 4: Pan map to East Coast",
+      "Step 5: Verify map displays correctly",
+      "Step 6: Pan map to Southern states",
+      "Step 7: Verify map displays correctly",
+      "Step 8: Verify smooth panning throughout"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Mobile layout displays full-screen map with bottom sheet overlay",
+    "steps": [
+      "Step 1: Navigate to homepage on mobile device (<768px width)",
+      "Step 2: Take screenshot",
+      "Step 3: Verify map takes full screen",
+      "Step 4: Verify storm selector dropdown is at top",
+      "Step 5: Verify map control buttons are at bottom-left",
+      "Step 6: Click a marker",
+      "Step 7: Verify bottom sheet slides up from bottom",
+      "Step 8: Verify bottom sheet has rounded top corners (16px)",
+      "Step 9: Verify bottom sheet has backdrop blur effect",
+      "Step 10: Verify bottom sheet has drag handle at top"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Desktop layout displays left sidebar with map taking remaining space",
+    "steps": [
+      "Step 1: Navigate to homepage on desktop (>1024px width)",
+      "Step 2: Take screenshot",
+      "Step 3: Verify left sidebar is 300px wide",
+      "Step 4: Verify sidebar contains storm selector",
+      "Step 5: Verify sidebar shows aggregate snowfall statistics",
+      "Step 6: Verify map takes remaining horizontal space",
+      "Step 7: Verify map controls are in top-right corner",
+      "Step 8: Click a marker",
+      "Step 9: Verify popup appears directly above marker (not bottom sheet)"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Tablet layout adapts appropriately between mobile and desktop",
+    "steps": [
+      "Step 1: Navigate to homepage on tablet (768-1024px width)",
+      "Step 2: Take screenshot",
+      "Step 3: Verify layout is responsive and usable",
+      "Step 4: Verify no horizontal scrolling",
+      "Step 5: Verify controls are accessible",
+      "Step 6: Verify text is readable"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "All touch targets meet 44px minimum size on mobile",
+    "steps": [
+      "Step 1: Navigate to homepage on mobile",
+      "Step 2: Inspect map control buttons",
+      "Step 3: Verify buttons are at least 44x44px",
+      "Step 4: Inspect storm selector dropdown",
+      "Step 5: Verify tap target is at least 44px",
+      "Step 6: Inspect markers on map",
+      "Step 7: Verify markers are 40px diameter (close to 44px minimum)",
+      "Step 8: Test tapping all interactive elements",
+      "Step 9: Verify all elements are easily tappable"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Color palette matches design system specification",
+    "steps": [
+      "Step 1: Navigate to homepage",
+      "Step 2: Inspect primary accent color",
+      "Step 3: Verify blue accent is #2563EB",
+      "Step 4: Inspect background color",
+      "Step 5: Verify background is #FFFFFF (light mode)",
+      "Step 6: Inspect text color",
+      "Step 7: Verify text is #1E293B (light mode)",
+      "Step 8: Verify snowfall gradient colors match spec"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Typography follows design system with proper font stack",
+    "steps": [
+      "Step 1: Navigate to homepage",
+      "Step 2: Inspect font family",
+      "Step 3: Verify font stack includes Inter, -apple-system, SF Pro, system-ui",
+      "Step 4: Verify base text size is 16px",
+      "Step 5: Verify headings are font-semibold",
+      "Step 6: Verify body text has leading-relaxed (1.625)",
+      "Step 7: Verify snowfall amounts use monospace font and font-bold"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Marker design matches specification with circular pins and color gradient",
+    "steps": [
+      "Step 1: Navigate to homepage",
+      "Step 2: Inspect marker elements",
+      "Step 3: Verify markers are circular",
+      "Step 4: Verify marker size is 40px diameter on mobile",
+      "Step 5: Verify marker size is 32px diameter on desktop",
+      "Step 6: Verify snowfall amount is displayed inside marker",
+      "Step 7: Verify white text with subtle shadow",
+      "Step 8: Hover over marker on desktop",
+      "Step 9: Verify pulse animation on hover"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Bottom sheet component matches design specification",
+    "steps": [
+      "Step 1: Navigate to homepage on mobile",
+      "Step 2: Click a marker to open bottom sheet",
+      "Step 3: Verify rounded top corners (16px radius)",
+      "Step 4: Verify backdrop blur effect is applied",
+      "Step 5: Verify drag handle is visible at top",
+      "Step 6: Verify smooth slide-up animation (300ms ease-out)",
+      "Step 7: Verify shadow provides depth",
+      "Step 8: Swipe down to dismiss",
+      "Step 9: Verify smooth slide-down animation"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Button styles follow design system specification",
+    "steps": [
+      "Step 1: Navigate to homepage",
+      "Step 2: Inspect primary buttons",
+      "Step 3: Verify blue background (#2563EB)",
+      "Step 4: Verify white text",
+      "Step 5: Verify 8px border radius",
+      "Step 6: Inspect icon buttons",
+      "Step 7: Verify 44x44px touch targets",
+      "Step 8: Verify 8px border radius",
+      "Step 9: Hover over buttons",
+      "Step 10: Verify appropriate hover states",
+      "Step 11: Inspect disabled button",
+      "Step 12: Verify 0.5 opacity"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Storm selector dropdown matches design specification",
+    "steps": [
+      "Step 1: Navigate to homepage",
+      "Step 2: Inspect storm selector dropdown",
+      "Step 3: Verify subtle border",
+      "Step 4: Open dropdown",
+      "Step 5: Verify smooth expand/collapse animation",
+      "Step 6: Hover over storm items",
+      "Step 7: Verify light background on hover",
+      "Step 8: Verify selected storm has blue accent",
+      "Step 9: Verify each item shows date + snowfall preview"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Map transitions are smooth with proper timing (500ms ease-in-out)",
+    "steps": [
+      "Step 1: Navigate to homepage",
+      "Step 2: Pan the map",
+      "Step 3: Verify smooth easing for map movements",
+      "Step 4: Verify transition duration is approximately 500ms",
+      "Step 5: Use reset button",
+      "Step 6: Verify smooth animation to Chicago",
+      "Step 7: Verify ease-in-out timing function"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Visualization toggle transitions are smooth (300ms fade)",
+    "steps": [
+      "Step 1: Navigate to homepage",
+      "Step 2: Toggle between heatmap/markers/both",
+      "Step 3: Verify smooth fade transitions",
+      "Step 4: Verify transition duration is approximately 300ms",
+      "Step 5: Verify no jarring layer switches"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Marker pop-in animation uses spring animation (200ms)",
+    "steps": [
+      "Step 1: Navigate to homepage",
+      "Step 2: Zoom in to trigger new markers appearing",
+      "Step 3: Verify markers pop in with spring animation",
+      "Step 4: Verify animation duration is approximately 200ms",
+      "Step 5: Verify smooth, bouncy entrance"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Loading spinner has continuous rotation animation",
+    "steps": [
+      "Step 1: Navigate to homepage during initial load",
+      "Step 2: Observe loading spinner",
+      "Step 3: Verify continuous smooth rotation",
+      "Step 4: Verify no stuttering or pauses",
+      "Step 5: Verify appropriate size and visibility"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Skeleton loaders display during content loading",
+    "steps": [
+      "Step 1: Navigate to homepage during initial load",
+      "Step 2: Verify skeleton loaders appear",
+      "Step 3: Verify loaders match shape of actual content",
+      "Step 4: Verify subtle pulsing animation",
+      "Step 5: Wait for content to load",
+      "Step 6: Verify smooth transition from skeleton to content"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Responsive breakpoints work correctly at 768px and 1024px",
+    "steps": [
+      "Step 1: Set viewport to 767px width",
+      "Step 2: Verify mobile layout is active",
+      "Step 3: Set viewport to 768px width",
+      "Step 4: Verify tablet layout is active",
+      "Step 5: Set viewport to 1024px width",
+      "Step 6: Verify tablet layout is still active",
+      "Step 7: Set viewport to 1025px width",
+      "Step 8: Verify desktop layout is active"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Map uses Mapbox Streets base layer style",
+    "steps": [
+      "Step 1: Navigate to homepage",
+      "Step 2: Verify Mapbox Streets style is loaded",
+      "Step 3: Verify streets and labels are visible",
+      "Step 4: Verify muted colors allow snow data to stand out",
+      "Step 5: Verify appropriate detail level at various zoom levels"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Page load performance meets target of under 2 seconds on 3G",
+    "steps": [
+      "Step 1: Simulate 3G connection speed",
+      "Step 2: Navigate to homepage",
+      "Step 3: Measure time to initial paint",
+      "Step 4: Verify First Contentful Paint is under 1 second",
+      "Step 5: Measure time to interactive",
+      "Step 6: Verify Time to Interactive is under 3 seconds",
+      "Step 7: Measure total page load time",
+      "Step 8: Verify total load is under 2 seconds",
+      "Step 9: Verify Lighthouse performance score is 90+"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Bundle size meets target of under 500KB gzipped",
+    "steps": [
+      "Step 1: Build production bundle",
+      "Step 2: Measure gzipped JavaScript bundle size",
+      "Step 3: Verify total is under 500KB",
+      "Step 4: Verify code splitting is implemented",
+      "Step 5: Verify lazy loading for map component"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Environment variables are properly configured",
+    "steps": [
+      "Step 1: Check for .env.local or .env file",
+      "Step 2: Verify NEXT_PUBLIC_MAPBOX_TOKEN is defined",
+      "Step 3: Verify Mapbox token is valid",
+      "Step 4: Verify map loads correctly with token",
+      "Step 5: Verify no tokens are exposed in client bundle"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "TypeScript types are properly defined for all data structures",
+    "steps": [
+      "Step 1: Check types/ directory exists",
+      "Step 2: Verify type definition for Storm data",
+      "Step 3: Verify type definition for Measurement data",
+      "Step 4: Verify type definition for API responses",
+      "Step 5: Run TypeScript compiler",
+      "Step 6: Verify no type errors",
+      "Step 7: Verify proper type inference throughout codebase"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Project structure follows Next.js 14+ App Router conventions",
+    "steps": [
+      "Step 1: Verify app/ directory exists",
+      "Step 2: Verify app/page.tsx exists (homepage)",
+      "Step 3: Verify app/api/ directory exists for API routes",
+      "Step 4: Verify components/ directory exists",
+      "Step 5: Verify lib/ directory exists for utilities",
+      "Step 6: Verify types/ directory exists",
+      "Step 7: Verify proper use of server and client components"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Tailwind CSS is properly configured for mobile-first design",
+    "steps": [
+      "Step 1: Check tailwind.config.js exists",
+      "Step 2: Verify mobile-first breakpoints are configured",
+      "Step 3: Verify custom colors from design system are added",
+      "Step 4: Verify Tailwind utilities work in components",
+      "Step 5: Build project and verify CSS is generated correctly"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Mapbox GL JS is properly installed and configured",
+    "steps": [
+      "Step 1: Verify mapbox-gl dependency is installed",
+      "Step 2: Verify Mapbox token is configured",
+      "Step 3: Verify map initializes correctly",
+      "Step 4: Verify map controls are functional",
+      "Step 5: Verify no console errors related to Mapbox"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "React Context provides snowfall data to components",
+    "steps": [
+      "Step 1: Verify context provider is created",
+      "Step 2: Verify context wraps app at appropriate level",
+      "Step 3: Verify components can access snowfall data via context",
+      "Step 4: Verify state updates propagate correctly",
+      "Step 5: Verify no prop drilling is necessary"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Error boundary catches and displays React errors gracefully",
+    "steps": [
+      "Step 1: Implement error boundary component",
+      "Step 2: Trigger a React error",
+      "Step 3: Verify error boundary catches error",
+      "Step 4: Verify friendly error message is displayed",
+      "Step 5: Verify app doesn't crash completely",
+      "Step 6: Verify error is logged for debugging"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "404 page displays when navigating to non-existent routes",
+    "steps": [
+      "Step 1: Navigate to /non-existent-page",
+      "Step 2: Verify 404 page is displayed",
+      "Step 3: Verify friendly error message",
+      "Step 4: Verify link to return to homepage",
+      "Step 5: Verify styling is consistent with site design"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "API error responses follow consistent format",
+    "steps": [
+      "Step 1: Trigger API error (invalid request)",
+      "Step 2: Verify error response has consistent structure",
+      "Step 3: Verify error includes message field",
+      "Step 4: Verify appropriate HTTP status code",
+      "Step 5: Verify error is logged on server"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Map maintains state when toggling between visualization modes",
+    "steps": [
+      "Step 1: Navigate to homepage",
+      "Step 2: Pan map to specific location",
+      "Step 3: Set zoom level",
+      "Step 4: Toggle visualization mode",
+      "Step 5: Verify map position is maintained",
+      "Step 6: Verify zoom level is maintained",
+      "Step 7: Only visualization changes, not map state"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Mobile swipe gestures work on bottom sheet",
+    "steps": [
+      "Step 1: Navigate to homepage on mobile",
+      "Step 2: Click marker to open bottom sheet",
+      "Step 3: Swipe down on drag handle",
+      "Step 4: Verify bottom sheet dismisses",
+      "Step 5: Verify smooth swipe animation",
+      "Step 6: Open bottom sheet again",
+      "Step 7: Swipe up to expand (if collapsible)",
+      "Step 8: Verify appropriate expansion behavior"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Desktop popup positioning adjusts to avoid screen edges",
+    "steps": [
+      "Step 1: Navigate to homepage on desktop",
+      "Step 2: Click marker near top edge of screen",
+      "Step 3: Verify popup adjusts position to stay on screen",
+      "Step 4: Click marker near right edge",
+      "Step 5: Verify popup adjusts position",
+      "Step 6: Click marker in center",
+      "Step 7: Verify popup appears above marker as normal"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Map renders correctly with server-side rendering",
+    "steps": [
+      "Step 1: Check initial HTML response from server",
+      "Step 2: Verify map container is present in SSR HTML",
+      "Step 3: Verify no hydration errors in console",
+      "Step 4: Verify map becomes interactive after hydration",
+      "Step 5: Verify smooth transition from SSR to client-side"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Multiple data sources are correctly attributed in marker popups",
+    "steps": [
+      "Step 1: Navigate to homepage",
+      "Step 2: Click marker from NOAA NWS source",
+      "Step 3: Verify source is displayed as 'NOAA NWS'",
+      "Step 4: Click marker from NOAA Gridded source",
+      "Step 5: Verify source is displayed as 'NOAA Gridded'",
+      "Step 6: Verify proper attribution for each source type"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Timestamps are displayed in user-friendly format",
+    "steps": [
+      "Step 1: Navigate to homepage",
+      "Step 2: Click marker to view details",
+      "Step 3: Verify timestamp is displayed",
+      "Step 4: Verify format is readable (e.g., 'Jan 15, 2024 8:00 AM')",
+      "Step 5: Verify timezone is indicated or localized",
+      "Step 6: Verify relative time for recent measurements (e.g., '2 hours ago')"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Heatmap interpolates smoothly between measurement points",
+    "steps": [
+      "Step 1: Navigate to homepage",
+      "Step 2: View heatmap layer",
+      "Step 3: Verify smooth color gradients between points",
+      "Step 4: Verify no harsh boundaries",
+      "Step 5: Verify interpolation appears natural",
+      "Step 6: Verify heatmap updates when zooming"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Storm selector shows appropriate metadata for each storm",
+    "steps": [
+      "Step 1: Open storm selector dropdown",
+      "Step 2: Verify each storm shows date",
+      "Step 3: Verify each storm shows max snowfall amount",
+      "Step 4: Verify each storm shows station count",
+      "Step 5: Verify information is accurate and up-to-date"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Map handles areas with no snowfall data gracefully",
+    "steps": [
+      "Step 1: Navigate to homepage",
+      "Step 2: Pan to area with no recent snowfall",
+      "Step 3: Verify no markers appear in that area",
+      "Step 4: Verify heatmap shows neutral/zero snowfall",
+      "Step 5: Verify no error messages about missing data",
+      "Step 6: Verify map remains functional"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Data fetching retries on failure with exponential backoff",
+    "steps": [
+      "Step 1: Simulate temporary API failure",
+      "Step 2: Make request to /api/snowfall/latest",
+      "Step 3: Verify request retries automatically",
+      "Step 4: Verify increasing delay between retries (exponential backoff)",
+      "Step 5: Verify eventual success when API recovers",
+      "Step 6: Verify user sees loading state during retries"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Console has no errors or warnings in production build",
+    "steps": [
+      "Step 1: Build project for production",
+      "Step 2: Start production server",
+      "Step 3: Navigate to homepage",
+      "Step 4: Open browser console",
+      "Step 5: Verify no errors are logged",
+      "Step 6: Verify no warnings are logged",
+      "Step 7: Interact with all features",
+      "Step 8: Verify console remains clean"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Dark mode is supported (future enhancement)",
+    "steps": [
+      "Step 1: Navigate to homepage",
+      "Step 2: Check for dark mode toggle",
+      "Step 3: If implemented, toggle to dark mode",
+      "Step 4: Verify background is #0F172A",
+      "Step 5: Verify text is #F1F5F9",
+      "Step 6: Verify map style adapts for dark mode",
+      "Step 7: Verify all components are readable in dark mode"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "About page displays data source attribution and methodology",
+    "steps": [
+      "Step 1: Navigate to /about page",
+      "Step 2: Verify page exists and loads",
+      "Step 3: Verify NOAA NWS API is credited",
+      "Step 4: Verify NOAA Gridded Snowfall Analysis is credited",
+      "Step 5: Verify methodology is explained",
+      "Step 6: Verify links to data sources work",
+      "Step 7: Verify contact information or feedback method is provided"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Lighthouse accessibility score is 90+",
+    "steps": [
+      "Step 1: Run Lighthouse audit on homepage",
+      "Step 2: Check accessibility score",
+      "Step 3: Verify score is 90 or higher",
+      "Step 4: Review any accessibility issues",
+      "Step 5: Verify proper ARIA labels",
+      "Step 6: Verify keyboard navigation works",
+      "Step 7: Verify color contrast meets WCAG standards"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Keyboard navigation works for all interactive elements",
+    "steps": [
+      "Step 1: Navigate to homepage",
+      "Step 2: Use Tab key to navigate through interactive elements",
+      "Step 3: Verify focus indicators are visible",
+      "Step 4: Verify all buttons are keyboard accessible",
+      "Step 5: Verify storm selector can be opened with keyboard",
+      "Step 6: Verify storm items can be selected with arrow keys",
+      "Step 7: Verify Enter key activates selections",
+      "Step 8: Verify Escape key closes modals/dropdowns"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Screen reader announces map interactions and data updates",
+    "steps": [
+      "Step 1: Enable screen reader (VoiceOver, NVDA, etc)",
+      "Step 2: Navigate to homepage",
+      "Step 3: Verify page structure is announced",
+      "Step 4: Verify map region is identified",
+      "Step 5: Verify marker selections are announced",
+      "Step 6: Verify data updates are announced",
+      "Step 7: Verify all interactive elements have proper labels"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Map controls have descriptive ARIA labels",
+    "steps": [
+      "Step 1: Inspect map control buttons",
+      "Step 2: Verify each button has aria-label",
+      "Step 3: Verify labels are descriptive (e.g., 'Toggle to heatmap view')",
+      "Step 4: Verify toggle states are announced (aria-pressed)",
+      "Step 5: Verify zoom controls have appropriate labels",
+      "Step 6: Verify reset button has clear label"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Focus management works correctly when opening/closing overlays",
+    "steps": [
+      "Step 1: Navigate to homepage",
+      "Step 2: Use keyboard to open storm selector dropdown",
+      "Step 3: Verify focus moves to dropdown",
+      "Step 4: Close dropdown with Escape",
+      "Step 5: Verify focus returns to trigger button",
+      "Step 6: Click marker to open popup/bottom sheet",
+      "Step 7: Verify focus moves to popup content",
+      "Step 8: Close popup",
+      "Step 9: Verify focus returns appropriately"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Color contrast meets WCAG AA standards for all text",
+    "steps": [
+      "Step 1: Use color contrast checker tool",
+      "Step 2: Check contrast of body text on background",
+      "Step 3: Verify ratio is at least 4.5:1",
+      "Step 4: Check contrast of headings",
+      "Step 5: Verify ratio is at least 3:1",
+      "Step 6: Check marker text on colored backgrounds",
+      "Step 7: Verify readability across all snowfall gradient colors"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Map performance is optimized with hundreds of markers",
+    "steps": [
+      "Step 1: Load storm with 500+ measurement points",
+      "Step 2: Verify map loads within 2 seconds",
+      "Step 3: Pan and zoom the map",
+      "Step 4: Verify smooth 60fps performance",
+      "Step 5: Verify no lag or stuttering",
+      "Step 6: Check memory usage",
+      "Step 7: Verify no memory leaks over extended use"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Vercel deployment is configured correctly",
+    "steps": [
+      "Step 1: Deploy to Vercel",
+      "Step 2: Verify deployment succeeds",
+      "Step 3: Verify environment variables are set",
+      "Step 4: Visit deployed URL",
+      "Step 5: Verify app works in production",
+      "Step 6: Verify automatic deployments from git work",
+      "Step 7: Verify preview deployments for PRs work"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Vercel Analytics is set up and tracking page views",
+    "steps": [
+      "Step 1: Check Vercel Analytics configuration",
+      "Step 2: Navigate to homepage",
+      "Step 3: Verify page view is tracked",
+      "Step 4: Check Vercel Analytics dashboard",
+      "Step 5: Verify data appears correctly"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "README.md provides clear setup instructions",
+    "steps": [
+      "Step 1: Read README.md file",
+      "Step 2: Verify project overview is present",
+      "Step 3: Verify prerequisites are listed",
+      "Step 4: Verify installation steps are clear",
+      "Step 5: Verify environment variable setup is explained",
+      "Step 6: Verify run commands are provided",
+      "Step 7: Verify deployment instructions are included"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Unit tests for API routes have 80%+ coverage",
+    "steps": [
+      "Step 1: Run test suite",
+      "Step 2: Generate coverage report",
+      "Step 3: Check coverage for API route files",
+      "Step 4: Verify API routes have 80%+ coverage",
+      "Step 5: Verify data transformation utilities have 80%+ coverage",
+      "Step 6: Review any uncovered code paths"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Unit tests for utility functions have 80%+ coverage",
+    "steps": [
+      "Step 1: Run test suite",
+      "Step 2: Generate coverage report",
+      "Step 3: Check coverage for utility files",
+      "Step 4: Verify utility functions have 80%+ coverage",
+      "Step 5: Verify date formatting functions are tested",
+      "Step 6: Verify coordinate validation functions are tested"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Integration tests verify API route to external API flow",
+    "steps": [
+      "Step 1: Set up integration test with mocked external APIs",
+      "Step 2: Test /api/snowfall/latest with mocked NOAA response",
+      "Step 3: Verify correct data normalization",
+      "Step 4: Verify correct API response format",
+      "Step 5: Test error handling with failed external API",
+      "Step 6: Verify graceful error responses"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Integration tests verify map data flow from API to display",
+    "steps": [
+      "Step 1: Set up integration test with mocked API",
+      "Step 2: Render SnowfallMap component with test data",
+      "Step 3: Verify markers are rendered",
+      "Step 4: Verify heatmap layer is rendered",
+      "Step 5: Verify marker count matches data",
+      "Step 6: Verify no rendering errors"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Test suite runs successfully in CI environment",
+    "steps": [
+      "Step 1: Configure test script in package.json",
+      "Step 2: Push code to trigger CI (Vercel)",
+      "Step 3: Verify tests run automatically",
+      "Step 4: Verify all tests pass",
+      "Step 5: Verify deployment is blocked if tests fail"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "TypeScript type checking passes in CI",
+    "steps": [
+      "Step 1: Configure type check script",
+      "Step 2: Run tsc --noEmit",
+      "Step 3: Verify no type errors",
+      "Step 4: Push to trigger CI",
+      "Step 5: Verify type checking runs in CI",
+      "Step 6: Verify deployment is blocked if type errors exist"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "ESLint passes with no errors or warnings",
+    "steps": [
+      "Step 1: Configure ESLint for Next.js and TypeScript",
+      "Step 2: Run npm run lint",
+      "Step 3: Verify no errors",
+      "Step 4: Verify no warnings",
+      "Step 5: Verify ESLint runs in CI"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Git repository is initialized with proper .gitignore",
+    "steps": [
+      "Step 1: Verify .git directory exists",
+      "Step 2: Check .gitignore file",
+      "Step 3: Verify node_modules is ignored",
+      "Step 4: Verify .next is ignored",
+      "Step 5: Verify .env.local is ignored",
+      "Step 6: Verify build artifacts are ignored",
+      "Step 7: Verify no sensitive files are tracked"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Initial git commit includes all setup files",
+    "steps": [
+      "Step 1: Check git history",
+      "Step 2: Verify initial commit exists",
+      "Step 3: Verify commit includes feature_list.json",
+      "Step 4: Verify commit includes init.sh",
+      "Step 5: Verify commit includes README.md",
+      "Step 6: Verify commit message follows convention",
+      "Step 7: Verify CLAUDE.md and app_spec.txt are committed"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "init.sh script successfully sets up development environment",
+    "steps": [
+      "Step 1: Run ./init.sh from project root",
+      "Step 2: Verify dependencies are installed",
+      "Step 3: Verify development server starts",
+      "Step 4: Verify helpful information is printed",
+      "Step 5: Verify script exits successfully",
+      "Step 6: Access application at printed URL",
+      "Step 7: Verify app runs correctly"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Package.json has all required scripts defined",
+    "steps": [
+      "Step 1: Check package.json file",
+      "Step 2: Verify 'dev' script exists",
+      "Step 3: Verify 'build' script exists",
+      "Step 4: Verify 'start' script exists",
+      "Step 5: Verify 'lint' script exists",
+      "Step 6: Verify 'test' script exists",
+      "Step 7: Verify 'type-check' script exists"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Dependencies are installed correctly with proper versions",
+    "steps": [
+      "Step 1: Check package.json dependencies",
+      "Step 2: Verify Next.js 14+ is installed",
+      "Step 3: Verify React 18+ is installed",
+      "Step 4: Verify TypeScript is installed",
+      "Step 5: Verify Tailwind CSS is installed",
+      "Step 6: Verify mapbox-gl is installed",
+      "Step 7: Run npm install",
+      "Step 8: Verify no dependency conflicts",
+      "Step 9: Verify all dependencies install successfully"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Production build completes successfully without errors",
+    "steps": [
+      "Step 1: Run npm run build",
+      "Step 2: Verify build completes",
+      "Step 3: Verify no build errors",
+      "Step 4: Verify no type errors",
+      "Step 5: Check .next/ directory",
+      "Step 6: Verify static assets are generated",
+      "Step 7: Verify build size is reasonable (under 500KB gzipped)"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Development server starts and hot reload works",
+    "steps": [
+      "Step 1: Run npm run dev",
+      "Step 2: Verify server starts on port 3000",
+      "Step 3: Navigate to http://localhost:3000",
+      "Step 4: Verify app loads",
+      "Step 5: Make a code change",
+      "Step 6: Verify hot reload updates page",
+      "Step 7: Verify no manual refresh needed"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Image assets and favicons are properly configured",
+    "steps": [
+      "Step 1: Check public/ directory",
+      "Step 2: Verify favicon.ico exists",
+      "Step 3: Verify app icons for different sizes",
+      "Step 4: Navigate to homepage",
+      "Step 5: Verify favicon appears in browser tab",
+      "Step 6: Verify no 404 errors for icon files"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Meta tags are configured for SEO and social sharing",
+    "steps": [
+      "Step 1: View page source of homepage",
+      "Step 2: Verify <title> tag is present and descriptive",
+      "Step 3: Verify meta description is present",
+      "Step 4: Verify Open Graph tags for social sharing",
+      "Step 5: Verify Twitter Card tags",
+      "Step 6: Verify viewport meta tag for responsive",
+      "Step 7: Run Lighthouse SEO audit",
+      "Step 8: Verify SEO score is 90+"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "No horizontal scrolling on any screen size",
+    "steps": [
+      "Step 1: Navigate to homepage on mobile (375px width)",
+      "Step 2: Verify no horizontal scrollbar",
+      "Step 3: Test on tablet (768px width)",
+      "Step 4: Verify no horizontal scrollbar",
+      "Step 5: Test on desktop (1920px width)",
+      "Step 6: Verify no horizontal scrollbar",
+      "Step 7: Verify all content fits within viewport"
+    ],
+    "passes": false
+  },
+  {
+    "category": "style",
+    "description": "Text remains readable at all zoom levels",
+    "steps": [
+      "Step 1: Navigate to homepage",
+      "Step 2: Zoom browser to 50%",
+      "Step 3: Verify text is still readable",
+      "Step 4: Zoom browser to 150%",
+      "Step 5: Verify text is still readable",
+      "Step 6: Verify no text overflow",
+      "Step 7: Verify layout adapts appropriately"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Browser console logs are disabled in production",
+    "steps": [
+      "Step 1: Build for production",
+      "Step 2: Start production server",
+      "Step 3: Open browser console",
+      "Step 4: Navigate through app",
+      "Step 5: Verify no debug console.log statements",
+      "Step 6: Verify only intentional logs appear",
+      "Step 7: Verify no sensitive data in logs"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Multiple storms can be cached simultaneously",
+    "steps": [
+      "Step 1: Load latest storm data",
+      "Step 2: Switch to historical storm",
+      "Step 3: Switch back to latest storm",
+      "Step 4: Verify data loads from cache (fast)",
+      "Step 5: Switch to different historical storm",
+      "Step 6: Verify both storms remain cached",
+      "Step 7: Verify no unnecessary API calls"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Map viewport bounds are logged/tracked for analytics",
+    "steps": [
+      "Step 1: Navigate to homepage",
+      "Step 2: Pan map to different location",
+      "Step 3: Verify viewport bounds can be retrieved",
+      "Step 4: Verify useful for understanding user behavior",
+      "Step 5: Verify privacy-respecting (no PII)"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Aggregate statistics are displayed in sidebar (desktop)",
+    "steps": [
+      "Step 1: Navigate to homepage on desktop",
+      "Step 2: View left sidebar",
+      "Step 3: Verify total snowfall measurement count is shown",
+      "Step 4: Verify maximum snowfall amount is shown",
+      "Step 5: Verify average snowfall is shown (if applicable)",
+      "Step 6: Verify statistics update when storm is changed"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Map handles rapid interaction without lag",
+    "steps": [
+      "Step 1: Navigate to homepage",
+      "Step 2: Rapidly pan map in different directions",
+      "Step 3: Verify no lag or stuttering",
+      "Step 4: Rapidly zoom in and out",
+      "Step 5: Verify smooth performance",
+      "Step 6: Quickly toggle visualization modes multiple times",
+      "Step 7: Verify no crashes or errors"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "NOAA API data is correctly parsed and normalized",
+    "steps": [
+      "Step 1: Fetch raw data from NOAA NWS API",
+      "Step 2: Process through normalization function",
+      "Step 3: Verify coordinates are extracted correctly",
+      "Step 4: Verify snowfall amounts are in inches",
+      "Step 5: Verify timestamps are ISO formatted",
+      "Step 6: Verify station names are preserved",
+      "Step 7: Verify source field is set to NOAA_NWS"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "NOAA Gridded API data is correctly parsed and normalized",
+    "steps": [
+      "Step 1: Fetch raw data from NOAA Gridded MapServer",
+      "Step 2: Process through normalization function",
+      "Step 3: Verify grid points are converted to measurements",
+      "Step 4: Verify snowfall amounts are extracted correctly",
+      "Step 5: Verify timestamps are ISO formatted",
+      "Step 6: Verify source field is set to NOAA_GRIDDED",
+      "Step 7: Verify data integrates with NOAA NWS data"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Error messages are user-friendly and actionable",
+    "steps": [
+      "Step 1: Trigger various error conditions",
+      "Step 2: Verify error messages avoid technical jargon",
+      "Step 3: Verify messages explain what went wrong",
+      "Step 4: Verify messages suggest what user can do",
+      "Step 5: Verify messages are not scary or alarming",
+      "Step 6: Verify consistent error message styling"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Map respects user's reduced motion preference",
+    "steps": [
+      "Step 1: Enable reduced motion in OS settings",
+      "Step 2: Navigate to homepage",
+      "Step 3: Verify animations are reduced or disabled",
+      "Step 4: Pan and zoom map",
+      "Step 5: Verify transitions are instant or minimal",
+      "Step 6: Toggle visualization modes",
+      "Step 7: Verify smooth but not animated transitions"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Component testing for SnowfallMap with different data sets",
+    "steps": [
+      "Step 1: Render SnowfallMap with empty data",
+      "Step 2: Verify graceful handling of no data",
+      "Step 3: Render with small data set (10 points)",
+      "Step 4: Verify correct rendering",
+      "Step 5: Render with large data set (1000 points)",
+      "Step 6: Verify performance is acceptable",
+      "Step 7: Render with extreme values",
+      "Step 8: Verify gradient handles edge cases"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Component testing for StormSelector with various storms",
+    "steps": [
+      "Step 1: Render StormSelector with empty list",
+      "Step 2: Verify appropriate message is shown",
+      "Step 3: Render with single storm",
+      "Step 4: Verify dropdown works",
+      "Step 5: Render with 10 storms",
+      "Step 6: Verify all storms are listed",
+      "Step 7: Select different storm",
+      "Step 8: Verify callback is triggered with correct data"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "Component testing for MapControls toggle behavior",
+    "steps": [
+      "Step 1: Render MapControls component",
+      "Step 2: Verify initial state (both layers visible)",
+      "Step 3: Click heatmap button",
+      "Step 4: Verify callback with correct mode",
+      "Step 5: Verify active state styling",
+      "Step 6: Click markers button",
+      "Step 7: Verify callback with correct mode",
+      "Step 8: Test all toggle combinations"
+    ],
+    "passes": false
+  },
+  {
+    "category": "functional",
+    "description": "API route handles missing storm ID gracefully",
+    "steps": [
+      "Step 1: Make request to /api/snowfall/invalid-id",
+      "Step 2: Verify 404 response",
+      "Step 3: Verify error message explains storm not found",
+      "Step 4: Make request to /api/snowfall/ (no ID)",
+      "Step 5: Verify appropriate error response",
+      "Step 6: Verify no server crashes"
+    ],
+    "passes": false
+  }
+]

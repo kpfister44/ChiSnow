@@ -1,0 +1,421 @@
+<project_specification>
+  <project_name>ChiSnow - Snowfall Mapping Application</project_name>
+
+  <overview>
+    Build a mobile-first web application that displays actual snowfall totals on an interactive map after
+    snowfall events in the United States, with a primary focus on the Chicagoland area. The application
+    should provide a quick-check experience where users can visit after a snowstorm and immediately see
+    exact snowfall measurements displayed as both markers and a heatmap overlay. The MVP focuses on
+    post-storm data visualization with recent event history, fetching data from NOAA's National Weather
+    Service API and NOAA's National Gridded Snowfall Analysis. Future enhancements include live during-storm
+    updates, CoCoRaHS data integration, and model forecast comparison features.
+  </overview>
+
+  <technology_stack>
+    <frontend>
+      <framework>Next.js 14+ with App Router, React 18+, TypeScript</framework>
+      <styling>Tailwind CSS for mobile-first responsive design</styling>
+      <mapping>Mapbox GL JS for interactive maps with heatmap and marker layers</mapping>
+      <state_management>React Context + hooks (no Redux needed for MVP)</state_management>
+      <routing>Next.js App Router</routing>
+    </frontend>
+    <backend>
+      <runtime>Next.js API routes (serverless functions)</runtime>
+      <database>None for MVP - fetch fresh from external APIs with in-memory caching</database>
+      <external_apis>
+        - NOAA National Weather Service API (api.weather.gov)
+        - NOAA National Gridded Snowfall Analysis (MapServer REST API)
+        - CoCoRaHS API (future - requires access request)
+      </external_apis>
+      <caching>In-memory cache with 2-hour TTL in API routes</caching>
+    </backend>
+    <deployment>
+      <platform>Vercel (free tier)</platform>
+      <ci_cd>Automatic deployments from git commits</ci_cd>
+      <domain>chisnow.vercel.app (custom domain optional)</domain>
+    </deployment>
+  </technology_stack>
+
+  <prerequisites>
+    <environment_setup>
+      - Node.js 18+ and npm/pnpm installed
+      - Mapbox API key (free tier: 50k loads/month)
+      - Git initialized for version control
+      - Environment variables: NEXT_PUBLIC_MAPBOX_TOKEN
+    </environment_setup>
+  </prerequisites>
+
+  <core_features>
+    <map_interface>
+      - Interactive Mapbox map with touch-optimized controls
+      - Default view centered on Chicagoland area
+      - Pan and zoom across entire United States
+      - Dual visualization: heatmap layer + marker layer
+      - Toggle controls to switch between heatmap/markers/both
+      - Reset to Chicago button for quick re-centering
+      - Mobile bottom sheet and desktop sidebar for details
+      - Smooth animations and transitions
+    </map_interface>
+
+    <snowfall_visualization>
+      - Heatmap layer with blue-to-purple gradient based on snowfall amount
+      - Color-coded markers for individual measurement stations
+      - Marker clustering when zoomed out to reduce clutter
+      - Clickable markers with popups showing:
+        * Station name and location
+        * Exact snowfall amount
+        * Data source (NOAA NWS, NOAA Gridded)
+        * Measurement timestamp
+      - Clear visual hierarchy prioritizing heaviest snowfall
+    </snowfall_visualization>
+
+    <storm_selector>
+      - Display most recent snowfall event by default
+      - Dropdown to view last 5-10 storms this season
+      - Storm metadata preview: date, max snowfall, station count
+      - Smooth transitions when switching between storms
+      - Clear indication of currently selected storm
+    </storm_selector>
+
+    <data_management>
+      - API routes proxy external weather APIs
+      - Normalize data from multiple sources into unified format
+      - In-memory caching (2-hour TTL) to reduce API calls
+      - Graceful error handling for API failures
+      - Loading states and skeleton loaders
+      - Offline-friendly with cached data
+    </data_management>
+
+    <responsive_design>
+      - Mobile-first approach with touch-optimized controls
+      - Bottom sheet on mobile, sidebar on desktop
+      - Large touch targets (minimum 44px) for mobile usability
+      - Adaptive layout for tablet and desktop
+      - Performance optimized for 3G mobile connections
+      - Progressive enhancement strategy
+    </responsive_design>
+
+    <future_features>
+      - Live during-storm updates (2-3 times during active snowfall)
+      - CoCoRaHS community observation data integration
+      - Model forecast comparison (actual vs GFS/NAM/HRRR predictions)
+      - Historical storm archive (multiple seasons)
+      - User location detection and auto-centering
+      - Share storm view via URL
+    </future_features>
+  </core_features>
+
+  <api_endpoints_summary>
+    <snowfall_data>
+      - GET /api/snowfall/latest - Returns most recent snowfall event
+      - GET /api/snowfall/[stormId] - Returns specific historical storm data
+      - GET /api/storms - Returns list of recent storms for dropdown selector
+    </snowfall_data>
+
+    <data_format>
+      Response format for snowfall endpoints:
+      {
+        stormId: string,
+        date: ISO string,
+        measurements: [
+          {
+            lat: number,
+            lon: number,
+            amount: number (inches),
+            source: "NOAA_NWS" | "NOAA_GRIDDED" | "COCORAHS",
+            station: string,
+            timestamp: ISO string
+          }
+        ]
+      }
+    </data_format>
+  </api_endpoints_summary>
+
+  <ui_layout>
+    <main_structure>
+      - Single-page application with full-screen map
+      - Mobile: Bottom sheet overlay for storm details and controls
+      - Desktop: Left sidebar for storm selector and details
+      - Map controls: Overlay buttons on map surface
+      - Responsive breakpoints: mobile (<768px), tablet (768-1024px), desktop (>1024px)
+    </main_structure>
+
+    <mobile_layout>
+      - Full-screen map with floating controls
+      - Bottom sheet slides up when marker clicked
+      - Storm selector dropdown at top
+      - Map control buttons (toggle viz, reset view) bottom-left
+      - Swipe down to dismiss bottom sheet
+      - Large touch targets throughout
+    </mobile_layout>
+
+    <desktop_layout>
+      - Left sidebar (300px wide) with storm selector and summary stats
+      - Main map area takes remaining space
+      - Marker click shows popup directly on map
+      - Map controls top-right corner
+      - Sidebar shows aggregate snowfall statistics
+    </desktop_layout>
+
+    <map_components>
+      - Mapbox base layer (Streets style)
+      - Heatmap overlay (toggleable)
+      - Marker layer (toggleable, with clustering)
+      - Popup component for marker details
+      - Loading spinner during data fetch
+      - Error state overlay if data fails to load
+    </map_components>
+  </ui_layout>
+
+  <design_system>
+    <color_palette>
+      - Primary accent: Blue (#2563EB - clear sky blue)
+      - Background: White (#FFFFFF light mode), Dark navy (#0F172A dark mode)
+      - Surface: Light gray (#F8FAFC light), Dark blue-gray (#1E293B dark)
+      - Text: Dark gray (#1E293B light), Off-white (#F1F5F9 dark)
+      - Borders: Light gray (#E2E8F0 light), Dark gray (#334155 dark)
+
+      Snowfall gradient (heatmap and markers):
+      - 0-2 inches: Light blue (#DBEAFE)
+      - 2-4 inches: Medium blue (#60A5FA)
+      - 4-6 inches: Deep blue (#2563EB)
+      - 6-10 inches: Dark blue (#1E40AF)
+      - 10+ inches: Purple (#7C3AED)
+    </color_palette>
+
+    <typography>
+      - Sans-serif system font stack (Inter, -apple-system, SF Pro, system-ui)
+      - Headings: font-semibold, tracking-tight
+      - Body text: font-normal, leading-relaxed (1.625)
+      - Data values (snowfall amounts): font-mono, font-bold
+      - Mobile: base text 16px (no zoom on input focus)
+      - Desktop: base text 16px, scale up for headings
+    </typography>
+
+    <components>
+      <map_marker>
+        - Circular pin with snowfall amount inside
+        - Size: 40px diameter on mobile, 32px on desktop
+        - Background color from snowfall gradient
+        - White text with subtle shadow for legibility
+        - Pulse animation on hover/active
+        - Cluster markers show count badge
+      </map_marker>
+
+      <bottom_sheet>
+        - Rounded top corners (16px radius)
+        - Backdrop blur effect
+        - Drag handle at top
+        - Smooth slide-up animation
+        - Shadow for depth
+        - Swipe-down to dismiss gesture
+      </bottom_sheet>
+
+      <buttons>
+        - Primary: Blue background, white text, rounded (8px)
+        - Secondary: Border with hover fill transition
+        - Icon buttons: 44x44px touch target, rounded (8px)
+        - Disabled: Reduced opacity (0.5), no pointer events
+      </buttons>
+
+      <storm_selector>
+        - Dropdown with subtle border
+        - Storm items show date + snowfall preview
+        - Hover state with light background
+        - Selected state with blue accent
+        - Smooth expand/collapse animation
+      </storm_selector>
+    </components>
+
+    <animations>
+      - Map transitions: 500ms ease-in-out
+      - Bottom sheet slide: 300ms ease-out
+      - Marker pop-in: 200ms spring animation
+      - Toggle switches: 150ms ease
+      - Loading spinner: Continuous rotation
+      - Skeleton loaders for content loading
+    </animations>
+  </design_system>
+
+  <key_interactions>
+    <initial_page_load>
+      1. User visits ChiSnow URL
+      2. Server-side fetches latest storm data from NOAA APIs
+      3. Map renders with Chicagoland centered
+      4. Heatmap and markers display snowfall data
+      5. Storm selector shows current event by default
+      6. Page loads in under 2 seconds on 3G
+    </initial_page_load>
+
+    <marker_interaction>
+      1. User taps/clicks marker on map
+      2. Mobile: Bottom sheet slides up with station details
+      3. Desktop: Popup appears above marker
+      4. Display: Station name, exact amount, source, timestamp
+      5. Tap outside or swipe down to dismiss
+      6. Map stays centered on marker
+    </marker_interaction>
+
+    <visualization_toggle>
+      1. User clicks toggle button (Heatmap/Markers/Both)
+      2. Smooth fade transition between layers (300ms)
+      3. Button state updates to show active view
+      4. Map data persists, only visualization changes
+      5. Toggle state persists during storm switching
+    </visualization_toggle>
+
+    <storm_switching>
+      1. User opens storm selector dropdown
+      2. List shows last 5-10 storms with date + preview
+      3. User selects different storm
+      4. Loading indicator appears briefly
+      5. Map data updates with new storm measurements
+      6. Smooth transition between data sets
+      7. Map re-centers if new storm has different focus area
+    </storm_switching>
+
+    <map_navigation>
+      1. User pans map with touch/mouse drag
+      2. Pinch to zoom on mobile, scroll on desktop
+      3. Double-tap to zoom in
+      4. Reset button returns to Chicagoland view
+      5. Smooth easing for all map movements
+      6. Markers cluster/uncluster based on zoom level
+    </map_navigation>
+  </key_interactions>
+
+  <implementation_steps>
+    <step number="1">
+      <title>Project Setup and API Integration</title>
+      <tasks>
+        - Initialize Next.js 14+ project with TypeScript and Tailwind CSS
+        - Set up project structure (app/, components/, lib/, types/)
+        - Create environment variables for Mapbox token
+        - Implement API route /api/snowfall/latest
+        - Connect to NOAA NWS API and NOAA Gridded API
+        - Build data normalization and aggregation logic
+        - Add in-memory caching with 2-hour TTL
+        - Write unit tests for API routes and data transformation
+      </tasks>
+    </step>
+
+    <step number="2">
+      <title>Core Map Interface</title>
+      <tasks>
+        - Install and configure Mapbox GL JS
+        - Create SnowfallMap component with Mapbox integration
+        - Set up default view centered on Chicago
+        - Implement basic pan and zoom controls
+        - Add touch gesture support for mobile
+        - Create loading and error states
+        - Ensure map renders server-side for performance
+        - Test map on multiple devices and browsers
+      </tasks>
+    </step>
+
+    <step number="3">
+      <title>Data Visualization Layers</title>
+      <tasks>
+        - Implement heatmap layer with snowfall gradient
+        - Create marker layer with color-coded pins
+        - Add marker clustering for zoomed-out views
+        - Build toggle controls for heatmap/markers/both
+        - Implement smooth transitions between visualizations
+        - Create custom marker design with snowfall amounts
+        - Add popup/bottom sheet for marker details
+        - Optimize performance for hundreds of data points
+      </tasks>
+    </step>
+
+    <step number="4">
+      <title>Storm Selection and History</title>
+      <tasks>
+        - Create StormSelector dropdown component
+        - Implement /api/storms endpoint for recent events
+        - Build storm list UI with date and preview
+        - Add storm switching functionality
+        - Implement data fetching on storm change
+        - Create loading states during transitions
+        - Add /api/snowfall/[stormId] endpoint for historical data
+        - Test smooth transitions between storms
+      </tasks>
+    </step>
+
+    <step number="5">
+      <title>Mobile Optimization and Responsive Design</title>
+      <tasks>
+        - Build bottom sheet component for mobile
+        - Implement swipe gestures for bottom sheet
+        - Create desktop sidebar layout
+        - Add responsive breakpoints for all components
+        - Ensure 44px minimum touch targets
+        - Optimize map controls for mobile
+        - Test on real devices (iOS and Android)
+        - Verify performance on 3G connection
+        - Implement progressive enhancement
+      </tasks>
+    </step>
+
+    <step number="6">
+      <title>Polish, Testing, and Deployment</title>
+      <tasks>
+        - Add skeleton loaders and loading states
+        - Implement error handling and retry logic
+        - Create 404 and error pages
+        - Write integration tests for key user flows
+        - Set up Vercel deployment with environment variables
+        - Configure automatic deployments from git
+        - Test production build performance
+        - Set up Vercel Analytics
+        - Create About page with data source attribution
+        - Document API endpoints and component usage
+      </tasks>
+    </step>
+  </implementation_steps>
+
+  <success_criteria>
+    <functionality>
+      - Map loads with latest snowfall data within 2 seconds
+      - Markers and heatmap accurately display snowfall amounts
+      - Storm selector switches between recent events smoothly
+      - All map interactions work on mobile and desktop
+      - API routes successfully fetch and normalize NOAA data
+      - Graceful error handling when APIs are unavailable
+    </functionality>
+
+    <user_experience>
+      - Mobile-first design with intuitive touch controls
+      - Clear visual hierarchy prioritizing snowfall data
+      - Smooth animations and transitions throughout
+      - Fast response times on 3G mobile connections
+      - Accessible controls with proper touch target sizes
+      - Clear feedback for all user actions
+    </user_experience>
+
+    <technical_quality>
+      - Clean, maintainable TypeScript codebase
+      - Proper error handling and logging
+      - Efficient API caching to reduce external calls
+      - Optimized bundle size and load times
+      - Comprehensive test coverage (80%+ for API routes)
+      - Successful deployment to Vercel
+    </technical_quality>
+
+    <design_polish>
+      - Cohesive blue-themed color palette
+      - Beautiful snowfall gradient visualization
+      - Responsive layout across all device sizes
+      - Professional, weather-focused aesthetic
+      - Smooth map interactions and animations
+      - Clear typography and data presentation
+    </design_polish>
+
+    <performance_targets>
+      - Initial page load: Under 2 seconds on 3G
+      - Lighthouse performance score: 90+
+      - First Contentful Paint: Under 1 second
+      - Time to Interactive: Under 3 seconds
+      - Bundle size: Under 500KB (gzipped)
+    </performance_targets>
+  </success_criteria>
+</project_specification>
