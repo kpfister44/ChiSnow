@@ -41,7 +41,7 @@
       "Step 5: Verify each storm has id, date, totalStations, maxSnowfall fields",
       "Step 6: Verify storms are ordered by date (most recent first)"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
