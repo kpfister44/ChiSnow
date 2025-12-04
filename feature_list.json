@@ -193,7 +193,7 @@
       "Step 8: Verify current storm is indicated/highlighted",
       "Step 9: Verify storms are ordered by date (most recent first)"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -210,7 +210,7 @@
       "Step 9: Verify storm selector shows newly selected storm",
       "Step 10: Verify map re-centers if storm has different focus area"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
