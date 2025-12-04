@@ -164,7 +164,7 @@
       "Step 10: Double-tap on map",
       "Step 11: Verify map zooms in on tap location"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
