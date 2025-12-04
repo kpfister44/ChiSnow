@@ -3,11 +3,13 @@
 
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { Delaunay } from 'd3-delaunay';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import type { SnowfallEvent } from '@/types';
+
+type VisualizationMode = 'heatmap' | 'markers' | 'both';
 
 interface SnowfallMapProps {
   data: SnowfallEvent;
@@ -102,6 +104,8 @@ function createVoronoiPolygons(measurements: SnowfallEvent['measurements'], boun
 export default function SnowfallMap({ data }: SnowfallMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
+  const markers = useRef<mapboxgl.Marker[]>([]);
+  const [vizMode, setVizMode] = useState<VisualizationMode>('both');
 
   // Reset map to Chicago default view
   const resetToChicago = () => {
@@ -114,6 +118,41 @@ export default function SnowfallMap({ data }: SnowfallMapProps) {
       essential: true
     });
   };
+
+  // Update layer visibility based on visualization mode
+  useEffect(() => {
+    if (!map.current) return;
+
+    const showHeatmap = vizMode === 'heatmap' || vizMode === 'both';
+    const showMarkers = vizMode === 'markers' || vizMode === 'both';
+
+    // Update heatmap layers visibility with fade transition
+    if (map.current.getLayer('snowfall-fill')) {
+      map.current.setPaintProperty(
+        'snowfall-fill',
+        'fill-opacity',
+        showHeatmap ? 0.6 : 0
+      );
+    }
+
+    if (map.current.getLayer('snowfall-borders')) {
+      map.current.setPaintProperty(
+        'snowfall-borders',
+        'line-opacity',
+        showHeatmap ? 0.3 : 0
+      );
+    }
+
+    // Update markers visibility
+    markers.current.forEach(marker => {
+      const element = marker.getElement();
+      if (element) {
+        element.style.transition = 'opacity 300ms ease-in-out';
+        element.style.opacity = showMarkers ? '1' : '0';
+        element.style.pointerEvents = showMarkers ? 'auto' : 'none';
+      }
+    });
+  }, [vizMode]);
 
   useEffect(() => {
     if (map.current || !mapContainer.current) return;
@@ -160,7 +199,8 @@ export default function SnowfallMap({ data }: SnowfallMapProps) {
         source: 'snowfall-regions',
         paint: {
           'fill-color': ['get', 'color'],
-          'fill-opacity': 0.6
+          'fill-opacity': 0.6,
+          'fill-opacity-transition': { duration: 300 }
         }
       });
 
@@ -172,7 +212,8 @@ export default function SnowfallMap({ data }: SnowfallMapProps) {
         paint: {
           'line-color': '#ffffff',
           'line-width': 1,
-          'line-opacity': 0.3
+          'line-opacity': 0.3,
+          'line-opacity-transition': { duration: 300 }
         }
       });
 
@@ -204,10 +245,13 @@ export default function SnowfallMap({ data }: SnowfallMapProps) {
           </div>
         `);
 
-        new mapboxgl.Marker(el)
+        const marker = new mapboxgl.Marker(el)
           .setLngLat([measurement.lon, measurement.lat])
           .setPopup(popup)
           .addTo(map.current!);
+
+        // Store marker reference for visibility control
+        markers.current.push(marker);
       });
     });
 
@@ -219,6 +263,46 @@ export default function SnowfallMap({ data }: SnowfallMapProps) {
   return (
     <div data-testid="snowfall-map" className="relative w-full h-screen">
       <div ref={mapContainer} data-testid="map-container" className="w-full h-full" />
+
+      {/* Toggle controls for visualization mode */}
+      <div className="absolute bottom-8 right-4 bg-white rounded-lg shadow-md border border-gray-300 z-10 flex">
+        <button
+          onClick={() => setVizMode('heatmap')}
+          className={`px-4 py-2 text-sm font-semibold transition-colors duration-200 rounded-l-lg ${
+            vizMode === 'heatmap'
+              ? 'bg-blue-600 text-white'
+              : 'bg-white text-gray-800 hover:bg-gray-50'
+          }`}
+          data-testid="toggle-heatmap"
+          aria-label="Show heatmap only"
+        >
+          Heatmap
+        </button>
+        <button
+          onClick={() => setVizMode('markers')}
+          className={`px-4 py-2 text-sm font-semibold transition-colors duration-200 border-x border-gray-300 ${
+            vizMode === 'markers'
+              ? 'bg-blue-600 text-white'
+              : 'bg-white text-gray-800 hover:bg-gray-50'
+          }`}
+          data-testid="toggle-markers"
+          aria-label="Show markers only"
+        >
+          Markers
+        </button>
+        <button
+          onClick={() => setVizMode('both')}
+          className={`px-4 py-2 text-sm font-semibold transition-colors duration-200 rounded-r-lg ${
+            vizMode === 'both'
+              ? 'bg-blue-600 text-white'
+              : 'bg-white text-gray-800 hover:bg-gray-50'
+          }`}
+          data-testid="toggle-both"
+          aria-label="Show both heatmap and markers"
+        >
+          Both
+        </button>
+      </div>
 
       {/* Reset to Chicago button */}
       <button

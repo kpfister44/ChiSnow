@@ -146,7 +146,7 @@
       "Step 10: Verify button shows active state",
       "Step 11: Verify smooth fade transitions (300ms) between states"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
