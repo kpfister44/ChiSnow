@@ -82,7 +82,7 @@
       "Step 7: Verify areas with 10+ inches show purple (#7C3AED)",
       "Step 8: Verify smooth color transitions between amounts"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -95,7 +95,7 @@
       "Step 5: Verify markers are circular pins",
       "Step 6: Verify white text is readable on colored background"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -114,7 +114,7 @@
       "Step 11: Verify can dismiss popup/bottom sheet by clicking outside",
       "Step 12: On mobile: verify can dismiss by swiping down"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
