@@ -1,10 +1,11 @@
 // ABOUTME: Map component that displays snowfall data on an interactive Mapbox map
-// ABOUTME: Shows heatmap and markers for snowfall measurements
+// ABOUTME: Shows filled regions (choropleth) and markers for snowfall measurements
 
 'use client';
 
 import { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
+import { Delaunay } from 'd3-delaunay';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import type { SnowfallEvent } from '@/types';
 
@@ -19,6 +20,83 @@ function getSnowfallColor(amount: number): string {
   if (amount >= 4) return '#2563EB';  // Deep blue
   if (amount >= 2) return '#60A5FA';  // Medium blue
   return '#DBEAFE';                   // Light blue
+}
+
+// Interpolate snowfall value at a point using Inverse Distance Weighting
+function interpolateValue(
+  lon: number,
+  lat: number,
+  measurements: SnowfallEvent['measurements'],
+  power: number = 2
+): number {
+  let weightSum = 0;
+  let valueSum = 0;
+
+  for (const m of measurements) {
+    // Calculate Euclidean distance
+    const dx = lon - m.lon;
+    const dy = lat - m.lat;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    // Avoid division by zero for exact matches
+    if (distance < 0.001) {
+      return m.amount;
+    }
+
+    // Inverse distance weighting
+    const weight = 1 / Math.pow(distance, power);
+    weightSum += weight;
+    valueSum += weight * m.amount;
+  }
+
+  return valueSum / weightSum;
+}
+
+// Create dense grid with interpolated values, then generate Voronoi polygons
+function createVoronoiPolygons(measurements: SnowfallEvent['measurements'], bounds: [[number, number], [number, number]]) {
+  if (measurements.length === 0) return [];
+
+  const [[minX, minY], [maxX, maxY]] = bounds;
+
+  // Create dense grid of interpolated points
+  const gridResolution = 0.15; // Grid spacing in degrees (~10 miles)
+  const gridPoints: Array<{ lon: number; lat: number; amount: number }> = [];
+
+  for (let lon = minX; lon <= maxX; lon += gridResolution) {
+    for (let lat = minY; lat <= maxY; lat += gridResolution) {
+      const interpolatedAmount = interpolateValue(lon, lat, measurements);
+      gridPoints.push({ lon, lat, amount: interpolatedAmount });
+    }
+  }
+
+  // Create Delaunay triangulation from dense grid
+  const points = gridPoints.map(p => [p.lon, p.lat] as [number, number]);
+  const delaunay = Delaunay.from(points);
+
+  // Create Voronoi diagram
+  const voronoi = delaunay.voronoi([minX, minY, maxX, maxY]);
+
+  // Convert Voronoi cells to GeoJSON features
+  const features = [];
+  for (let i = 0; i < gridPoints.length; i++) {
+    const cell = voronoi.cellPolygon(i);
+    if (!cell) continue;
+
+    const amount = gridPoints[i].amount;
+    features.push({
+      type: 'Feature' as const,
+      properties: {
+        amount: amount,
+        color: getSnowfallColor(amount)
+      },
+      geometry: {
+        type: 'Polygon' as const,
+        coordinates: [cell.map(([x, y]) => [x, y])]
+      }
+    });
+  }
+
+  return features;
 }
 
 export default function SnowfallMap({ data }: SnowfallMapProps) {
@@ -43,7 +121,45 @@ export default function SnowfallMap({ data }: SnowfallMapProps) {
     map.current.on('load', () => {
       if (!map.current) return;
 
-      // Add markers for each measurement
+      // Create Voronoi polygons for choropleth visualization
+      const bounds: [[number, number], [number, number]] = [
+        [-95, 38], // Southwest corner (expanded for Illinois region)
+        [-82, 45]  // Northeast corner
+      ];
+      const voronoiFeatures = createVoronoiPolygons(data.measurements, bounds);
+
+      // Add filled regions (choropleth style)
+      map.current!.addSource('snowfall-regions', {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: voronoiFeatures
+        }
+      });
+
+      map.current!.addLayer({
+        id: 'snowfall-fill',
+        type: 'fill',
+        source: 'snowfall-regions',
+        paint: {
+          'fill-color': ['get', 'color'],
+          'fill-opacity': 0.6
+        }
+      });
+
+      // Add borders between regions for clarity
+      map.current!.addLayer({
+        id: 'snowfall-borders',
+        type: 'line',
+        source: 'snowfall-regions',
+        paint: {
+          'line-color': '#ffffff',
+          'line-width': 1,
+          'line-opacity': 0.3
+        }
+      });
+
+      // Add markers for each measurement (on top of filled regions)
       data.measurements.forEach((measurement) => {
         const el = document.createElement('div');
         el.className = 'snowfall-marker';
@@ -75,47 +191,6 @@ export default function SnowfallMap({ data }: SnowfallMapProps) {
           .setLngLat([measurement.lon, measurement.lat])
           .setPopup(popup)
           .addTo(map.current!);
-      });
-
-      // Add heatmap layer
-      map.current!.addSource('snowfall-heat', {
-        type: 'geojson',
-        data: {
-          type: 'FeatureCollection',
-          features: data.measurements.map((m) => ({
-            type: 'Feature',
-            properties: {
-              amount: m.amount,
-            },
-            geometry: {
-              type: 'Point',
-              coordinates: [m.lon, m.lat],
-            },
-          })),
-        },
-      });
-
-      map.current!.addLayer({
-        id: 'snowfall-heat',
-        type: 'heatmap',
-        source: 'snowfall-heat',
-        paint: {
-          'heatmap-weight': ['interpolate', ['linear'], ['get', 'amount'], 0, 0, 15, 1],
-          'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 0, 1, 12, 3],
-          'heatmap-color': [
-            'interpolate',
-            ['linear'],
-            ['heatmap-density'],
-            0, 'rgba(219, 234, 254, 0)',
-            0.2, '#DBEAFE',
-            0.4, '#60A5FA',
-            0.6, '#2563EB',
-            0.8, '#1E40AF',
-            1, '#7C3AED',
-          ],
-          'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 0, 10, 12, 30],
-          'heatmap-opacity': 0.6,
-        },
       });
     });
 

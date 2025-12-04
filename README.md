@@ -5,7 +5,7 @@ A mobile-first web application that displays actual snowfall totals on an intera
 ## Features
 
 - **Interactive Map**: View snowfall data on an interactive Mapbox map
-- **Dual Visualization**: Toggle between heatmap and marker layers
+- **Dual Visualization**: Toggle between choropleth (filled regions) and marker layers
 - **Recent Storm History**: Access the last 5-10 snowfall events
 - **Mobile-First Design**: Optimized for mobile devices with responsive layouts
 - **Real Data**: Fetches actual measurements from NOAA APIs

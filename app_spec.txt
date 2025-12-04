@@ -5,7 +5,7 @@
     Build a mobile-first web application that displays actual snowfall totals on an interactive map after
     snowfall events in the United States, with a primary focus on the Chicagoland area. The application
     should provide a quick-check experience where users can visit after a snowstorm and immediately see
-    exact snowfall measurements displayed as both markers and a heatmap overlay. The MVP focuses on
+    exact snowfall measurements displayed as both markers and a choropleth overlay. The MVP focuses on
     post-storm data visualization with recent event history, fetching data from NOAA's National Weather
     Service API and NOAA's National Gridded Snowfall Analysis. Future enhancements include live during-storm
     updates, CoCoRaHS data integration, and model forecast comparison features.
@@ -15,7 +15,7 @@
     <frontend>
       <framework>Next.js 14+ with App Router, React 18+, TypeScript</framework>
       <styling>Tailwind CSS for mobile-first responsive design</styling>
-      <mapping>Mapbox GL JS for interactive maps with heatmap and marker layers</mapping>
+      <mapping>Mapbox GL JS for interactive maps with choropleth and marker layers</mapping>
       <state_management>React Context + hooks (no Redux needed for MVP)</state_management>
       <routing>Next.js App Router</routing>
     </frontend>
@@ -50,17 +50,21 @@
       - Interactive Mapbox map with touch-optimized controls
       - Default view centered on Chicagoland area
       - Pan and zoom across entire United States
-      - Dual visualization: heatmap layer + marker layer
-      - Toggle controls to switch between heatmap/markers/both
+      - Dual visualization: choropleth layer + marker layer
+      - Toggle controls to switch between filled regions/markers/both
       - Reset to Chicago button for quick re-centering
       - Mobile bottom sheet and desktop sidebar for details
       - Smooth animations and transitions
     </map_interface>
 
     <snowfall_visualization>
-      - Heatmap layer with blue-to-purple gradient based on snowfall amount
-      - Color-coded markers for individual measurement stations
-      - Marker clustering when zoomed out to reduce clutter
+      - Choropleth layer (filled regions) with blue-to-purple gradient based on snowfall amount
+      - Uses Inverse Distance Weighting (IDW) interpolation on dense grid for smooth transitions
+      - Grid resolution: 0.15° (~10 miles) for natural weather-map appearance
+      - Voronoi tessellation creates distinct colored zones from interpolated grid
+      - Color-coded markers for individual measurement stations overlaid on filled regions
+      - Subtle white borders between color zones for clarity
+      - Marker clustering when zoomed out to reduce clutter (future)
       - Clickable markers with popups showing:
         * Station name and location
         * Exact snowfall amount
@@ -159,7 +163,7 @@
 
     <map_components>
       - Mapbox base layer (Streets style)
-      - Heatmap overlay (toggleable)
+      - Choropleth overlay (toggleable)
       - Marker layer (toggleable, with clustering)
       - Popup component for marker details
       - Loading spinner during data fetch
@@ -175,7 +179,7 @@
       - Text: Dark gray (#1E293B light), Off-white (#F1F5F9 dark)
       - Borders: Light gray (#E2E8F0 light), Dark gray (#334155 dark)
 
-      Snowfall gradient (heatmap and markers):
+      Snowfall gradient (filled regions and markers):
       - 0-2 inches: Light blue (#DBEAFE)
       - 2-4 inches: Medium blue (#60A5FA)
       - 4-6 inches: Deep blue (#2563EB)
@@ -316,10 +320,10 @@
     <step number="3">
       <title>Data Visualization Layers</title>
       <tasks>
-        - Implement heatmap layer with snowfall gradient
+        - Implement choropleth layer with IDW interpolation and snowfall gradient
         - Create marker layer with color-coded pins
         - Add marker clustering for zoomed-out views
-        - Build toggle controls for heatmap/markers/both
+        - Build toggle controls for filled regions/markers/both
         - Implement smooth transitions between visualizations
         - Create custom marker design with snowfall amounts
         - Add popup/bottom sheet for marker details
@@ -376,7 +380,7 @@
   <success_criteria>
     <functionality>
       - Map loads with latest snowfall data within 2 seconds
-      - Markers and heatmap accurately display snowfall amounts
+      - Markers and choropleth accurately display snowfall amounts
       - Storm selector switches between recent events smoothly
       - All map interactions work on mobile and desktop
       - API routes successfully fetch and normalize NOAA data
