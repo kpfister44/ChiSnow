@@ -103,6 +103,18 @@ export default function SnowfallMap({ data }: SnowfallMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
 
+  // Reset map to Chicago default view
+  const resetToChicago = () => {
+    if (!map.current) return;
+
+    map.current.flyTo({
+      center: [-87.6298, 41.8781],
+      zoom: 9,
+      duration: 1500, // 1.5 second smooth animation
+      essential: true
+    });
+  };
+
   useEffect(() => {
     if (map.current || !mapContainer.current) return;
 
@@ -114,6 +126,11 @@ export default function SnowfallMap({ data }: SnowfallMapProps) {
       center: [-87.6298, 41.8781], // Chicago
       zoom: 9,
     });
+
+    // Expose map instance for testing
+    if (typeof window !== 'undefined') {
+      (window as any).mapInstance = map.current;
+    }
 
     // Add navigation controls
     map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
@@ -202,6 +219,16 @@ export default function SnowfallMap({ data }: SnowfallMapProps) {
   return (
     <div data-testid="snowfall-map" className="relative w-full h-screen">
       <div ref={mapContainer} data-testid="map-container" className="w-full h-full" />
+
+      {/* Reset to Chicago button */}
+      <button
+        onClick={resetToChicago}
+        className="absolute bottom-8 left-4 bg-white hover:bg-gray-50 text-gray-800 font-semibold py-2 px-4 border border-gray-300 rounded-lg shadow-md transition-colors duration-200 z-10"
+        data-testid="reset-chicago-btn"
+        aria-label="Reset to Chicago"
+      >
+        Reset to Chicago
+      </button>
     </div>
   );
 }
