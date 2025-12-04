@@ -1163,3 +1163,53 @@ Starting state: 9/102 tests passing (8.82%)
 ===========================================
 Session 5 complete - 10 tests passing! 🎉
 ===========================================
+
+
+## SESSION 5 CONTINUED - Additional Features
+
+### Test #12: Reset to Chicago Button (✓ Complete)
+- **Implementation:**
+  - Added resetToChicago() function with map.flyTo()
+  - Smooth 1.5s animation to Chicago coordinates
+  - Button positioned bottom-left with Tailwind styling
+  - Exposed window.mapInstance for testing
+- **Testing:** test_reset_chicago.py - all 6 steps passing
+- **Commit:** 1cd3c55
+
+### Test #10: Toggle Controls (✓ Complete)
+- **Implementation:**
+  - VisualizationMode state management (heatmap/markers/both)
+  - Three toggle buttons with active state (blue background)
+  - Dynamic layer visibility with 300ms transitions
+  - Heatmap: fill-opacity and line-opacity transitions
+  - Markers: CSS opacity transitions with stored references
+  - Bottom-right button group with proper styling
+- **Testing:** test_toggle_controls.py - all 11 steps passing
+- **Commit:** 1759060
+
+## UPDATED SESSION STATS
+
+**Tests Passing: 12/102 (11.76%)**
+- Test #1: Initial page load ✅
+- Test #2: API /api/snowfall/latest ✅
+- Test #3: API /api/storms ✅
+- Test #4: API /api/snowfall/[stormId] ✅
+- Test #6: Heatmap gradient ✅
+- Test #7: Marker display ✅
+- Test #8: Marker click popup ✅
+- Test #10: Toggle controls ✅ (NEW!)
+- Test #11: Map pan and zoom ✅ (NEW!)
+- Test #12: Reset to Chicago ✅ (NEW!)
+- Test #13: Storm selector ✅
+- Test #14: Storm switching ✅
+
+**Session 5 Total:**
+- Tests Completed: 3 (Tests #10, #11, #12)
+- Files Created: 3 test scripts
+- Files Modified: 2 (SnowfallMap.tsx, feature_list.json)
+- Git Commits: 3
+- Progress: 9/102 → 12/102 (2.94% gain)
+
+===========================================
+Session 5 extended - 12 tests passing! 🚀
+===========================================
