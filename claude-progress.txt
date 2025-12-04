@@ -441,3 +441,85 @@ de22ced docs: update progress with Next.js initialization completion
 ===========================================
 Session 2 complete - 1 feature implemented!
 ===========================================
+
+## SESSION 2 CONTINUED (Same Session)
+
+### Additional Features Completed
+
+### 5. API Route /api/storms (✓ Complete)
+- **Files Created**:
+  - `app/api/storms/route.ts` - API route handler
+  - `app/api/storms/route.test.ts` - Test suite
+  - `lib/storm-generator.ts` - Storm metadata generator
+
+- **Implementation Details**:
+  - Returns list of 7 recent storms with metadata
+  - Each storm includes: id, date, totalStations, maxSnowfall
+  - Storms ordered by date (most recent first)
+  - Caching with 2-hour TTL
+  - All 5 tests passing
+
+- **Test Coverage**: ✓ Marked test #3 as passing
+
+### 6. API Route /api/snowfall/[stormId] (✓ Complete)
+- **Files Created**:
+  - `app/api/snowfall/[stormId]/route.ts` - Dynamic route handler
+  - `app/api/snowfall/[stormId]/route.test.ts` - Test suite
+
+- **Implementation Details**:
+  - Dynamic route accepting stormId parameter
+  - Returns snowfall data for specific storm
+  - Validates stormId format (storm-YYYY-MM-DD)
+  - Returns 404 for invalid/future storms
+  - Per-storm caching with 2-hour TTL
+  - All 5 tests passing (including 404 validation)
+
+- **Test Coverage**: ✓ Marked test #4 as passing
+
+## UPDATED SESSION STATS
+
+- **Total Features Completed This Session**: 3
+- **Tests Passing**: 3/102 (2.94% complete)
+- **Files Created**: 10
+- **Git Commits**: 4
+- **Tests Written**: 17 (7 + 5 + 5)
+- **Tests Passing**: 17/17
+- **Lines of Code**: ~600+
+- **Context Used**: ~88k/200k tokens (44%)
+
+## TESTS PASSING
+
+**Total: 3/102 tests passing (2.94% complete)**
+
+Passing tests:
+- Test #2: API route /api/snowfall/latest returns correct data format ✅
+- Test #3: API route /api/storms returns list of recent storms ✅
+- Test #4: API route /api/snowfall/[stormId] returns specific storm data ✅
+
+## COMMIT HISTORY (Session 2)
+
+```
+bde96e3 feat: implement /api/snowfall/[stormId] dynamic route
+afd9058 feat: implement /api/storms endpoint
+0e56880 docs: update progress summary for session 2
+cea3a11 feat: implement /api/snowfall/latest endpoint with NOAA integration
+```
+
+## NEXT PRIORITIES
+
+All core API routes for Step 1 are now complete! Next options:
+
+**Option 1: Start STEP 2 - Core Map Interface**
+- Test #1: Initial page load displays map with snowfall data
+- Install and configure Mapbox GL JS
+- Create SnowfallMap component
+- Implement interactive map with Chicago default view
+
+**Option 2: Continue with visualization features**
+- Test #5: API caching verification
+- Test #6: Heatmap layer displays snowfall gradient
+- Other map-related features
+
+===========================================
+Session 2 extended - 3 total features done!
+===========================================
