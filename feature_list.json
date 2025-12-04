@@ -14,7 +14,7 @@
       "Step 9: Verify loading states complete successfully",
       "Step 10: Verify map is interactive (can pan and zoom)"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
