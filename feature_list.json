@@ -467,7 +467,7 @@
       "Step 6: Verify smooth animation to Chicago",
       "Step 7: Verify ease-in-out timing function"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
@@ -479,7 +479,7 @@
       "Step 4: Verify transition duration is approximately 300ms",
       "Step 5: Verify no jarring layer switches"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
@@ -543,7 +543,7 @@
       "Step 4: Verify muted colors allow snow data to stand out",
       "Step 5: Verify appropriate detail level at various zoom levels"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
