@@ -503,7 +503,7 @@
       "Step 4: Verify no stuttering or pauses",
       "Step 5: Verify appropriate size and visibility"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
@@ -583,7 +583,7 @@
       "Step 4: Verify map loads correctly with token",
       "Step 5: Verify no tokens are exposed in client bundle"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
