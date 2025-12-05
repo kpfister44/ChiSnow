@@ -42,10 +42,14 @@ def test_homepage():
         else:
             print("  ✗ Map container NOT found")
 
-        # Step 4: Verify snowfall data is visible (check for markers)
+        # Step 4: Verify snowfall data is visible (check for markers via Mapbox API)
         print("\n✓ Step 4: Checking for snowfall markers...")
-        markers = page.locator('.snowfall-marker')
-        marker_count = markers.count()
+        marker_count = page.evaluate("""() => {
+            const map = window.mapInstance;
+            if (!map) return 0;
+            const features = map.queryRenderedFeatures({ layers: ['unclustered-point', 'clusters'] });
+            return features.length;
+        }""")
         print(f"  ✓ Found {marker_count} snowfall markers")
         if marker_count == 0:
             print("  ✗ No markers found - data may not be visible")
