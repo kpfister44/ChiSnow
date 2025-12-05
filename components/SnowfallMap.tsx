@@ -9,6 +9,12 @@ import { Delaunay } from 'd3-delaunay';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import type { SnowfallEvent } from '@/types';
 
+declare global {
+  interface Window {
+    mapInstance?: mapboxgl.Map;
+  }
+}
+
 type VisualizationMode = 'heatmap' | 'markers' | 'both';
 
 interface SnowfallMapProps {
@@ -162,6 +168,85 @@ export default function SnowfallMap({ data }: SnowfallMapProps) {
     }
   }, [vizMode]);
 
+  // Update map data when storm changes
+  useEffect(() => {
+    console.log('useEffect triggered for data change, stormId:', data.stormId);
+
+    if (!map.current) {
+      console.log('No map instance yet');
+      return;
+    }
+
+    const updateMapData = () => {
+      if (!map.current) {
+        console.warn('Map instance not available');
+        return;
+      }
+
+      console.log('Attempting to update map data for storm:', data.stormId);
+      console.log('Measurements count:', data.measurements.length);
+
+      // Check if sources exist
+      let snowfallSource: mapboxgl.GeoJSONSource | null = null;
+      let markersSource: mapboxgl.GeoJSONSource | null = null;
+
+      try {
+        snowfallSource = map.current.getSource('snowfall-regions') as mapboxgl.GeoJSONSource;
+        markersSource = map.current.getSource('markers') as mapboxgl.GeoJSONSource;
+      } catch (error) {
+        console.error('Error getting sources:', error);
+        return;
+      }
+
+      if (!snowfallSource || !markersSource) {
+        console.warn('Sources not ready yet, waiting for idle event');
+        if (map.current) {
+          map.current.once('idle', updateMapData);
+        }
+        return;
+      }
+
+      console.log('Sources found, updating data...');
+
+      // Update choropleth data
+      const bounds: [[number, number], [number, number]] = [
+        [-95, 38], // Southwest corner (expanded for Illinois region)
+        [-82, 45]  // Northeast corner
+      ];
+      const voronoiFeatures = createVoronoiPolygons(data.measurements, bounds);
+
+      snowfallSource.setData({
+        type: 'FeatureCollection',
+        features: voronoiFeatures
+      });
+      console.log('✓ Updated snowfall-regions source');
+
+      // Update marker data
+      const markersGeoJSON = {
+        type: 'FeatureCollection' as const,
+        features: data.measurements.map(m => ({
+          type: 'Feature' as const,
+          geometry: {
+            type: 'Point' as const,
+            coordinates: [m.lon, m.lat]
+          },
+          properties: {
+            amount: m.amount,
+            station: m.station,
+            source: m.source,
+            timestamp: m.timestamp,
+            color: getSnowfallColor(m.amount)
+          }
+        }))
+      };
+
+      markersSource.setData(markersGeoJSON);
+      console.log('✓ Updated markers source');
+    };
+
+    updateMapData();
+  }, [data.stormId]);
+
   useEffect(() => {
     if (map.current || !mapContainer.current) return;
 
@@ -176,7 +261,7 @@ export default function SnowfallMap({ data }: SnowfallMapProps) {
 
     // Expose map instance for testing
     if (typeof window !== 'undefined') {
-      (window as any).mapInstance = map.current;
+      window.mapInstance = map.current || undefined;
     }
 
     // Add navigation controls
@@ -199,7 +284,7 @@ export default function SnowfallMap({ data }: SnowfallMapProps) {
           type: 'FeatureCollection',
           features: voronoiFeatures
         }
-      });
+      } as mapboxgl.GeoJSONSourceSpecification);
 
       map.current!.addLayer({
         id: 'snowfall-fill',
@@ -338,9 +423,10 @@ export default function SnowfallMap({ data }: SnowfallMapProps) {
         const source = map.current.getSource('markers') as mapboxgl.GeoJSONSource;
 
         source.getClusterExpansionZoom(clusterId, (err, zoom) => {
-          if (err || !map.current) return;
+          if (err || !map.current || zoom === null) return;
 
-          const coordinates = (features[0].geometry as any).coordinates;
+          const geometry = features[0].geometry as GeoJSON.Point;
+          const coordinates = geometry.coordinates as [number, number];
           map.current.easeTo({
             center: coordinates,
             zoom: zoom,
@@ -353,15 +439,18 @@ export default function SnowfallMap({ data }: SnowfallMapProps) {
       map.current!.on('click', 'unclustered-point', (e) => {
         if (!map.current || !e.features?.length) return;
 
-        const coordinates = (e.features[0].geometry as any).coordinates.slice();
+        const geometry = e.features[0].geometry as GeoJSON.Point;
+        const coordinates = geometry.coordinates.slice() as [number, number];
         const props = e.features[0].properties;
+
+        if (!props) return;
 
         new mapboxgl.Popup()
           .setLngLat(coordinates)
           .setHTML(`
             <div style="padding: 8px;">
               <strong>${props.station}</strong><br/>
-              <strong>${props.amount}" snowfall</strong><br/>
+              <strong>${props.amount}&quot; snowfall</strong><br/>
               Source: ${props.source}<br/>
               ${new Date(props.timestamp).toLocaleString()}
             </div>

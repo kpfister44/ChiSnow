@@ -12,10 +12,10 @@ import { fetchAllNoaaSnowfall } from '@/lib/noaa-client';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { stormId: string } }
+  { params }: { params: Promise<{ stormId: string }> }
 ) {
   try {
-    const { stormId } = params;
+    const { stormId } = await params;
 
     // Validate stormId format (should be like "storm-2025-12-04")
     if (!stormId || !stormId.match(/^storm-\d{4}-\d{2}-\d{2}$/)) {

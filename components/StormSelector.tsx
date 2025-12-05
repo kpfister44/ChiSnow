@@ -38,8 +38,8 @@ export default function StormSelector({
           <h2 className="text-lg font-semibold text-gray-900">
             {formatDate(selectedStorm.date)}
           </h2>
-          <div className="flex gap-4 mt-1 text-sm text-gray-600">
-            <span className="font-bold text-blue-600">{selectedStorm.maxSnowfall}" max</span>
+          <div className="flex gap-4 mt-1 text-gray-600">
+            <span className="font-bold text-blue-600">{selectedStorm.maxSnowfall}&quot; max</span>
             <span>{selectedStorm.totalStations} stations</span>
           </div>
         </div>
@@ -52,7 +52,7 @@ export default function StormSelector({
           >
             {storms.map((storm) => (
               <option key={storm.id} value={storm.id}>
-                {formatDate(storm.date)} - {storm.maxSnowfall}"
+                {formatDate(storm.date)} - {storm.maxSnowfall}&quot;
               </option>
             ))}
           </select>
