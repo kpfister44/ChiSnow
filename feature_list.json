@@ -372,7 +372,7 @@
       "Step 7: Verify text is #1E293B (light mode)",
       "Step 8: Verify snowfall gradient colors match spec"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
@@ -386,7 +386,7 @@
       "Step 6: Verify body text has leading-relaxed (1.625)",
       "Step 7: Verify snowfall amounts use monospace font and font-bold"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
