@@ -2449,3 +2449,208 @@ This session exemplifies efficient test completion through:
 Session 9 Extended - 7 tests complete! 🎉
 ===========================================
 
+
+===========================================
+NOAA GRIDDED API IMPLEMENTATION ROADMAP
+Features #103-106 - Recommended Order
+===========================================
+
+## CONTEXT: Why Only 5 Markers?
+
+Current state: App displays only 5 markers because `lib/noaa-client.ts` 
+returns hardcoded mock data (lines 97-138). The storm metadata claims 
+15-50 stations but actual data only has 5 measurements.
+
+**Root cause:** MVP was never upgraded beyond initial mock data.
+
+## RECOMMENDED IMPLEMENTATION ORDER
+
+The next agent should tackle the new features in this sequence:
+
+### PHASE 1: Feature #103 - NOAA Gridded API Integration (12 steps)
+**Priority: CRITICAL - Foundation for all other features**
+
+Start here because you need real data before you can process it.
+
+**Key files to create:**
+- `lib/noaa-gridded-client.ts` - MapServer REST client
+- `lib/noaa-gridded-client.test.ts` - Unit tests
+
+**Critical steps:**
+1. Research NOAA MapServer endpoints (Step 1)
+2. Build basic REST client (Steps 2-4)
+3. Parse responses (Step 5)
+4. Error handling (Steps 8-9)
+
+**Success criteria:**
+- Can fetch real snowfall data from NOAA MapServer
+- Returns 30-50+ measurement points for Chicagoland area
+- Proper error handling and retry logic
+- Unit tests passing
+
+**Estimated complexity:** Medium-High (new API integration)
+
+---
+
+### PHASE 2: Feature #104 - Spatial Data Processing (12 steps)
+**Priority: HIGH - Required for smooth heatmap visualization**
+
+Do this second to process the raw data from Phase 1.
+
+**Key files to create:**
+- `lib/spatial-processor.ts` - IDW interpolation & grid generation
+- `lib/spatial-processor.test.ts` - Unit tests
+
+**Critical steps:**
+1. Grid generation with 0.15° resolution (Step 2)
+2. IDW interpolation algorithm (Step 3)
+3. Coordinate transformations (Step 5)
+4. Voronoi tessellation (Step 7)
+
+**Success criteria:**
+- Generates smooth gradient from sparse measurement points
+- 0.15° (~10 mile) grid resolution
+- Efficient spatial algorithms (can process 50+ points quickly)
+- Accurate interpolation validated against known data
+
+**Estimated complexity:** High (requires spatial algorithms knowledge)
+
+**Note:** This is the most technically complex feature. Consider:
+- Using existing spatial libraries if available (turf.js, etc)
+- Starting with simpler interpolation before full IDW
+- Validating output visually on map
+
+---
+
+### PHASE 3: Feature #106 - Production Integration (12 steps)
+**Priority: HIGH - Delivers immediate value**
+
+Do this third to actually USE the real data. This provides immediate 
+visible improvement (5 markers → 30-50+ markers).
+
+**Key files to modify:**
+- `lib/noaa-client.ts` - Replace mock data
+- `app/api/snowfall/latest/route.ts` - Handle real data
+- `app/api/storms/route.ts` - Real storm list
+- `lib/storm-generator.ts` - Real metadata
+
+**Critical steps:**
+1. Add feature flag for mock vs real (Step 8) - do this FIRST
+2. Update fetchNoaaGriddedSnowfall (Step 2)
+3. Integrate spatial processor (Step 3)
+4. Ensure metadata matches reality (Step 7)
+
+**Success criteria:**
+- 30-50+ markers display on map (vs current 5)
+- Storm metadata matches actual measurement counts
+- Can toggle between mock and real data
+- No regressions in existing tests
+- Heatmap shows smooth gradients
+
+**Estimated complexity:** Medium (integration work)
+
+**IMPORTANT:** Use feature flag to toggle mock/real data during 
+development. This allows testing without breaking existing functionality.
+
+---
+
+### PHASE 4: Feature #105 - Historical Storm Data (12 steps)
+**Priority: MEDIUM - Enhancement, not critical for MVP**
+
+Do this last. Historical data is valuable but not essential for 
+basic functionality.
+
+**Key files to create/modify:**
+- `lib/storm-storage.ts` - Persistence layer
+- Database schema OR JSON file storage
+- Migration scripts for historical data
+
+**Critical steps:**
+1. Choose storage approach (Step 1)
+2. Discover storms from NOAA (Step 2)
+3. Build real storm list endpoint (Step 4)
+4. Add caching (Step 6)
+
+**Success criteria:**
+- Can store and retrieve historical storms
+- Storm selector shows real historical events
+- Famous Chicago storms available (Jan 2011 blizzard, Feb 2015, etc)
+- Proper caching for historical data
+
+**Estimated complexity:** Medium (depends on storage approach)
+
+**Note:** For MVP, consider file-based JSON storage instead of database.
+Can upgrade to database later if needed.
+
+---
+
+## IMPLEMENTATION STRATEGY
+
+**Recommended approach:**
+
+1. **Start with Feature #103** - Get basic data flowing
+   - Build minimal viable API client first
+   - Get it working for ONE storm before generalizing
+   - Add error handling incrementally
+   - Test with real NOAA endpoints
+
+2. **Add Feature #104** - Process the data
+   - Start simple (basic interpolation)
+   - Validate visually on map
+   - Optimize performance if needed
+   - Can use libraries to speed development
+
+3. **Deploy Feature #106** - Ship real data
+   - Use feature flag throughout
+   - Test thoroughly with real vs mock
+   - Verify all existing tests still pass
+   - Get 30-50+ markers on map
+
+4. **Enhance with Feature #105** - Add historical data
+   - Start with file-based storage (simpler)
+   - Add 5-10 famous Chicago storms manually
+   - Can automate discovery later
+   - Historical data is "nice to have"
+
+## TESTING STRATEGY
+
+**For each phase:**
+
+1. Write tests BEFORE implementation (TDD)
+2. Test with real NOAA data, not mocks
+3. Verify no regressions (run all existing tests)
+4. Visual validation on map (use browser automation)
+5. Performance testing (API response times)
+
+## ESTIMATED EFFORT
+
+- **Phase 1 (API Integration):** 4-6 hours
+- **Phase 2 (Spatial Processing):** 6-8 hours (most complex)
+- **Phase 3 (Production Integration):** 3-4 hours
+- **Phase 4 (Historical Data):** 3-5 hours
+
+**Total:** 16-23 hours of focused development
+
+**Note:** This is complex work involving spatial algorithms and external 
+API integration. Take time to understand NOAA data formats before diving in.
+
+## SUCCESS METRICS
+
+**Before:** 5 hardcoded markers, fake metadata
+
+**After Phase 3:** 30-50+ real markers, accurate metadata, smooth heatmap
+
+**After Phase 4:** Real historical storms, persistent data
+
+## NEXT STEPS FOR NEXT AGENT
+
+1. Read this roadmap
+2. Start with Feature #103 (NOAA API Integration)
+3. Research NOAA MapServer API endpoints first
+4. Build incrementally with tests
+5. Use feature flags to avoid breaking existing functionality
+
+===========================================
+End of NOAA API Implementation Roadmap
+===========================================
+
