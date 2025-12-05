@@ -238,7 +238,7 @@
       "Step 7: Verify error state suggests trying again later",
       "Step 8: Verify app doesn't crash or show blank screen"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
