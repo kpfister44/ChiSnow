@@ -67,7 +67,7 @@
       "Step 6: Wait 2+ hours and make third request",
       "Step 7: Verify cache has expired and fresh data is fetched"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
