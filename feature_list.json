@@ -437,7 +437,7 @@
       "Step 11: Inspect disabled button",
       "Step 12: Verify 0.5 opacity"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
@@ -453,7 +453,7 @@
       "Step 8: Verify selected storm has blue accent",
       "Step 9: Verify each item shows date + snowfall preview"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
