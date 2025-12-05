@@ -170,43 +170,22 @@ export default function SnowfallMap({ data }: SnowfallMapProps) {
 
   // Update map data when storm changes
   useEffect(() => {
-    console.log('useEffect triggered for data change, stormId:', data.stormId);
-
-    if (!map.current) {
-      console.log('No map instance yet');
-      return;
-    }
+    if (!map.current) return;
 
     const updateMapData = () => {
-      if (!map.current) {
-        console.warn('Map instance not available');
-        return;
-      }
-
-      console.log('Attempting to update map data for storm:', data.stormId);
-      console.log('Measurements count:', data.measurements.length);
+      if (!map.current) return;
 
       // Check if sources exist
-      let snowfallSource: mapboxgl.GeoJSONSource | null = null;
-      let markersSource: mapboxgl.GeoJSONSource | null = null;
-
-      try {
-        snowfallSource = map.current.getSource('snowfall-regions') as mapboxgl.GeoJSONSource;
-        markersSource = map.current.getSource('markers') as mapboxgl.GeoJSONSource;
-      } catch (error) {
-        console.error('Error getting sources:', error);
-        return;
-      }
+      const snowfallSource = map.current.getSource('snowfall-regions') as mapboxgl.GeoJSONSource;
+      const markersSource = map.current.getSource('markers') as mapboxgl.GeoJSONSource;
 
       if (!snowfallSource || !markersSource) {
-        console.warn('Sources not ready yet, waiting for idle event');
+        // Sources not ready yet, wait for map to be idle
         if (map.current) {
           map.current.once('idle', updateMapData);
         }
         return;
       }
-
-      console.log('Sources found, updating data...');
 
       // Update choropleth data
       const bounds: [[number, number], [number, number]] = [
@@ -219,7 +198,6 @@ export default function SnowfallMap({ data }: SnowfallMapProps) {
         type: 'FeatureCollection',
         features: voronoiFeatures
       });
-      console.log('✓ Updated snowfall-regions source');
 
       // Update marker data
       const markersGeoJSON = {
@@ -241,7 +219,6 @@ export default function SnowfallMap({ data }: SnowfallMapProps) {
       };
 
       markersSource.setData(markersGeoJSON);
-      console.log('✓ Updated markers source');
     };
 
     updateMapData();
@@ -476,7 +453,7 @@ export default function SnowfallMap({ data }: SnowfallMapProps) {
     return () => {
       map.current?.remove();
     };
-  }, [data]);
+  }, []); // Only run once on mount - data updates handled by separate useEffect
 
   return (
     <div data-testid="snowfall-map" className="relative w-full h-screen">

@@ -223,7 +223,7 @@
       "Step 5: Switch back to original storm",
       "Step 6: Verify visualization is still 'Markers only'"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
