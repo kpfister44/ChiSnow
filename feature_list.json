@@ -128,7 +128,7 @@
       "Step 6: Verify cluster expands into individual markers",
       "Step 7: Verify smooth animation during cluster expansion"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

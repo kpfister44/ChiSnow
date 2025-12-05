@@ -104,7 +104,6 @@ function createVoronoiPolygons(measurements: SnowfallEvent['measurements'], boun
 export default function SnowfallMap({ data }: SnowfallMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
-  const markers = useRef<mapboxgl.Marker[]>([]);
   const [vizMode, setVizMode] = useState<VisualizationMode>('both');
 
   // Reset map to Chicago default view
@@ -143,15 +142,24 @@ export default function SnowfallMap({ data }: SnowfallMapProps) {
       );
     }
 
-    // Update markers visibility
-    markers.current.forEach(marker => {
-      const element = marker.getElement();
-      if (element) {
-        element.style.transition = 'opacity 300ms ease-in-out';
-        element.style.opacity = showMarkers ? '1' : '0';
-        element.style.pointerEvents = showMarkers ? 'auto' : 'none';
-      }
-    });
+    // Update marker layers visibility (clusters and unclustered points)
+    const markerOpacity = showMarkers ? 1 : 0;
+
+    if (map.current.getLayer('clusters')) {
+      map.current.setPaintProperty('clusters', 'circle-opacity', markerOpacity);
+    }
+
+    if (map.current.getLayer('cluster-count')) {
+      map.current.setPaintProperty('cluster-count', 'text-opacity', markerOpacity);
+    }
+
+    if (map.current.getLayer('unclustered-point')) {
+      map.current.setPaintProperty('unclustered-point', 'circle-opacity', markerOpacity);
+    }
+
+    if (map.current.getLayer('unclustered-point-label')) {
+      map.current.setPaintProperty('unclustered-point-label', 'text-opacity', markerOpacity);
+    }
   }, [vizMode]);
 
   useEffect(() => {
@@ -217,41 +225,162 @@ export default function SnowfallMap({ data }: SnowfallMapProps) {
         }
       });
 
-      // Add markers for each measurement (on top of filled regions)
-      data.measurements.forEach((measurement) => {
-        const el = document.createElement('div');
-        el.className = 'snowfall-marker';
-        el.style.backgroundColor = getSnowfallColor(measurement.amount);
-        el.style.width = '40px';
-        el.style.height = '40px';
-        el.style.borderRadius = '50%';
-        el.style.display = 'flex';
-        el.style.alignItems = 'center';
-        el.style.justifyContent = 'center';
-        el.style.color = 'white';
-        el.style.fontWeight = 'bold';
-        el.style.fontSize = '12px';
-        el.style.border = '2px solid white';
-        el.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
-        el.style.cursor = 'pointer';
-        el.textContent = measurement.amount.toFixed(1);
+      // Create GeoJSON source for markers with clustering
+      const markersGeoJSON = {
+        type: 'FeatureCollection' as const,
+        features: data.measurements.map(m => ({
+          type: 'Feature' as const,
+          geometry: {
+            type: 'Point' as const,
+            coordinates: [m.lon, m.lat]
+          },
+          properties: {
+            amount: m.amount,
+            station: m.station,
+            source: m.source,
+            timestamp: m.timestamp,
+            color: getSnowfallColor(m.amount)
+          }
+        }))
+      };
 
-        const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
-          <div style="padding: 8px;">
-            <strong>${measurement.station}</strong><br/>
-            <strong>${measurement.amount}" snowfall</strong><br/>
-            Source: ${measurement.source}<br/>
-            ${new Date(measurement.timestamp).toLocaleString()}
-          </div>
-        `);
+      map.current!.addSource('markers', {
+        type: 'geojson',
+        data: markersGeoJSON,
+        cluster: true,
+        clusterMaxZoom: 12, // Max zoom to cluster points
+        clusterRadius: 50   // Radius of each cluster when clustering points
+      });
 
-        const marker = new mapboxgl.Marker(el)
-          .setLngLat([measurement.lon, measurement.lat])
-          .setPopup(popup)
-          .addTo(map.current!);
+      // Layer for clustered points
+      map.current!.addLayer({
+        id: 'clusters',
+        type: 'circle',
+        source: 'markers',
+        filter: ['has', 'point_count'],
+        paint: {
+          'circle-color': '#2563EB', // Blue for clusters
+          'circle-radius': [
+            'step',
+            ['get', 'point_count'],
+            20,  // radius for clusters with < 10 points
+            10, 25,  // radius for clusters with 10-99 points
+            100, 30  // radius for clusters with 100+ points
+          ],
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#ffffff',
+          'circle-opacity': 1,
+          'circle-opacity-transition': { duration: 300 }
+        }
+      });
 
-        // Store marker reference for visibility control
-        markers.current.push(marker);
+      // Layer for cluster count labels
+      map.current!.addLayer({
+        id: 'cluster-count',
+        type: 'symbol',
+        source: 'markers',
+        filter: ['has', 'point_count'],
+        layout: {
+          'text-field': '{point_count_abbreviated}',
+          'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+          'text-size': 14
+        },
+        paint: {
+          'text-color': '#ffffff',
+          'text-opacity': 1,
+          'text-opacity-transition': { duration: 300 }
+        }
+      });
+
+      // Layer for unclustered points
+      map.current!.addLayer({
+        id: 'unclustered-point',
+        type: 'circle',
+        source: 'markers',
+        filter: ['!', ['has', 'point_count']],
+        paint: {
+          'circle-color': ['get', 'color'],
+          'circle-radius': 20,
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#ffffff',
+          'circle-opacity': 1,
+          'circle-opacity-transition': { duration: 300 }
+        }
+      });
+
+      // Layer for unclustered point labels (snowfall amounts)
+      map.current!.addLayer({
+        id: 'unclustered-point-label',
+        type: 'symbol',
+        source: 'markers',
+        filter: ['!', ['has', 'point_count']],
+        layout: {
+          'text-field': ['concat', ['to-string', ['get', 'amount']], '"'],
+          'text-font': ['DIN Offc Pro Bold', 'Arial Unicode MS Bold'],
+          'text-size': 12
+        },
+        paint: {
+          'text-color': '#ffffff',
+          'text-opacity': 1,
+          'text-opacity-transition': { duration: 300 }
+        }
+      });
+
+      // Click handler for clusters - zoom in
+      map.current!.on('click', 'clusters', (e) => {
+        if (!map.current) return;
+        const features = map.current.queryRenderedFeatures(e.point, {
+          layers: ['clusters']
+        });
+        if (!features.length) return;
+
+        const clusterId = features[0].properties?.cluster_id;
+        const source = map.current.getSource('markers') as mapboxgl.GeoJSONSource;
+
+        source.getClusterExpansionZoom(clusterId, (err, zoom) => {
+          if (err || !map.current) return;
+
+          const coordinates = (features[0].geometry as any).coordinates;
+          map.current.easeTo({
+            center: coordinates,
+            zoom: zoom,
+            duration: 500
+          });
+        });
+      });
+
+      // Click handler for unclustered points - show popup
+      map.current!.on('click', 'unclustered-point', (e) => {
+        if (!map.current || !e.features?.length) return;
+
+        const coordinates = (e.features[0].geometry as any).coordinates.slice();
+        const props = e.features[0].properties;
+
+        new mapboxgl.Popup()
+          .setLngLat(coordinates)
+          .setHTML(`
+            <div style="padding: 8px;">
+              <strong>${props.station}</strong><br/>
+              <strong>${props.amount}" snowfall</strong><br/>
+              Source: ${props.source}<br/>
+              ${new Date(props.timestamp).toLocaleString()}
+            </div>
+          `)
+          .addTo(map.current);
+      });
+
+      // Change cursor on hover
+      map.current!.on('mouseenter', 'clusters', () => {
+        if (map.current) map.current.getCanvas().style.cursor = 'pointer';
+      });
+      map.current!.on('mouseleave', 'clusters', () => {
+        if (map.current) map.current.getCanvas().style.cursor = '';
+      });
+      map.current!.on('mouseenter', 'unclustered-point', () => {
+        if (map.current) map.current.getCanvas().style.cursor = 'pointer';
+      });
+      map.current!.on('mouseleave', 'unclustered-point', () => {
+        if (map.current) map.current.getCanvas().style.cursor = '';
       });
     });
 
