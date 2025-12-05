@@ -4,6 +4,7 @@ Test script for ChiSnow homepage - Test #1 from feature_list.json
 Verifies initial page load displays map with snowfall data and storm selector
 """
 
+import os
 import time
 from playwright.sync_api import sync_playwright
 
@@ -31,8 +32,9 @@ def test_homepage():
         page.wait_for_timeout(2000)
 
         # Take screenshot for inspection
-        page.screenshot(path='test_screenshot_homepage.png', full_page=True)
-        print("✓ Screenshot saved: test_screenshot_homepage.png")
+        os.makedirs('tests/screenshots', exist_ok=True)
+        page.screenshot(path='tests/screenshots/test_01_homepage.png', full_page=True)
+        print("✓ Screenshot saved: tests/screenshots/test_01_homepage.png")
 
         # Step 3: Verify map is present and centered on Chicago
         print("\n✓ Step 3: Checking map container...")

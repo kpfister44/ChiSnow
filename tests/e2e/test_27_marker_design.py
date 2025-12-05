@@ -119,8 +119,9 @@ def test_marker_design():
 
         # Visual verification
         print("\n✓ Taking screenshot for visual verification...")
-        page.screenshot(path='test_screenshot_marker_design.png')
-        print("  ✓ Screenshot saved: test_screenshot_marker_design.png")
+        os.makedirs('tests/screenshots', exist_ok=True)
+        page.screenshot(path='tests/screenshots/test_marker_design.png')
+        print("  ✓ Screenshot saved: tests/screenshots/test_marker_design.png")
 
         # Zoom in to see markers more clearly
         print("\n✓ Zooming in for detailed marker view...")
@@ -129,7 +130,8 @@ def test_marker_design():
             if (map) map.setZoom(11);
         }""")
         time.sleep(1)
-        page.screenshot(path='test_screenshot_marker_detail.png')
+        os.makedirs('tests/screenshots', exist_ok=True)
+        page.screenshot(path='tests/screenshots/test_marker_detail.png')
         print("  ✓ Detail screenshot saved: test_screenshot_marker_detail.png")
 
         print("\n" + "=" * 60)

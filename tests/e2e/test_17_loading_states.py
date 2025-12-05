@@ -86,8 +86,9 @@ def test_loading_states():
             print("  ✓ No loading artifacts remaining")
 
         # Take screenshot
-        page.screenshot(path='test_screenshot_loading_states.png')
-        print("\n  ✓ Screenshot saved: test_screenshot_loading_states.png")
+        os.makedirs('tests/screenshots', exist_ok=True)
+        page.screenshot(path='tests/screenshots/test_loading_states.png')
+        print("\n  ✓ Screenshot saved: tests/screenshots/test_loading_states.png")
 
         print("\n" + "=" * 60)
         print("✅ Test #17 verification complete!")

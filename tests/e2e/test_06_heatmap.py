@@ -68,8 +68,9 @@ def test_heatmap():
         print("  ✓ Using Mapbox 'interpolate' with 'linear' for smooth gradients")
 
         # Take screenshot showing the heatmap
-        page.screenshot(path='test_screenshot_heatmap.png', full_page=True)
-        print("\n✓ Screenshot saved: test_screenshot_heatmap.png")
+        os.makedirs('tests/screenshots', exist_ok=True)
+        page.screenshot(path='tests/screenshots/test_heatmap.png', full_page=True)
+        print("\n✓ Screenshot saved: tests/screenshots/test_heatmap.png")
         print("  (Visual inspection of heatmap colors in screenshot)")
 
         # Verify markers show different colors based on amounts

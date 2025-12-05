@@ -79,8 +79,9 @@ def test_markers():
                 print(f"    ✓ Text is white - good contrast")
 
         # Take screenshot
-        page.screenshot(path='test_screenshot_markers.png', full_page=True)
-        print("\n✓ Screenshot saved: test_screenshot_markers.png")
+        os.makedirs('tests/screenshots', exist_ok=True)
+        page.screenshot(path='tests/screenshots/test_markers.png', full_page=True)
+        print("\n✓ Screenshot saved: tests/screenshots/test_markers.png")
 
         print("\n" + "=" * 60)
         print("✅ Test #7 verification complete!")

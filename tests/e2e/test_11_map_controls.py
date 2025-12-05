@@ -66,8 +66,9 @@ def test_map_controls():
         print("  ✓ Controls positioned in top-right corner")
 
         # Take screenshot
-        page.screenshot(path='test_screenshot_map_controls.png')
-        print("\n✓ Screenshot saved: test_screenshot_map_controls.png")
+        os.makedirs('tests/screenshots', exist_ok=True)
+        page.screenshot(path='tests/screenshots/test_map_controls.png')
+        print("\n✓ Screenshot saved: tests/screenshots/test_map_controls.png")
 
         browser.close()
 

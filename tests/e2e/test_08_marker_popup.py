@@ -45,7 +45,8 @@ def test_marker_popup():
             print("  ✓ Popup appeared after clicking marker")
         else:
             print("  ✗ No popup found after clicking marker")
-            page.screenshot(path='test_screenshot_popup_error.png')
+            os.makedirs('tests/screenshots', exist_ok=True)
+        page.screenshot(path='tests/screenshots/test_popup_error.png')
             browser.close()
             return False
 
@@ -104,8 +105,9 @@ def test_marker_popup():
             print("  ⚠ Popup may still be visible (or new popup opened)")
 
         # Take final screenshot
-        page.screenshot(path='test_screenshot_popup.png', full_page=True)
-        print("\n✓ Screenshot saved: test_screenshot_popup.png")
+        os.makedirs('tests/screenshots', exist_ok=True)
+        page.screenshot(path='tests/screenshots/test_popup.png', full_page=True)
+        print("\n✓ Screenshot saved: tests/screenshots/test_popup.png")
 
         print("\n" + "=" * 60)
         print("✅ Test #8 verification complete!")

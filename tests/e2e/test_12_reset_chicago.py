@@ -137,8 +137,9 @@ def test_reset_chicago():
             print("  ⚠ Could not verify zoom level (using visual verification)")
 
         # Take screenshot
-        page.screenshot(path='test_screenshot_reset_chicago.png')
-        print("\n✓ Screenshot saved: test_screenshot_reset_chicago.png")
+        os.makedirs('tests/screenshots', exist_ok=True)
+        page.screenshot(path='tests/screenshots/test_reset_chicago.png')
+        print("\n✓ Screenshot saved: tests/screenshots/test_reset_chicago.png")
 
         browser.close()
 

@@ -133,8 +133,9 @@ def test_storm_selector():
             print("  ⚠ Auto re-centering not implemented yet")
 
             # Take screenshot of new storm
-            page.screenshot(path='test_screenshot_storm_switch.png', full_page=True)
-            print("\n✓ Screenshot saved: test_screenshot_storm_switch.png")
+            os.makedirs('tests/screenshots', exist_ok=True)
+        page.screenshot(path='tests/screenshots/test_storm_switch.png', full_page=True)
+            print("\n✓ Screenshot saved: tests/screenshots/test_storm_switch.png")
 
         print("\n" + "=" * 60)
         print("✅ Tests #13 & #14 verification complete!")

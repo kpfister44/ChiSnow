@@ -160,8 +160,9 @@ def test_toggle_controls():
         print("  ✅ All transitions configured for 300ms")
 
         # Take screenshot
-        page.screenshot(path='test_screenshot_toggle_controls.png')
-        print("\n✓ Screenshot saved: test_screenshot_toggle_controls.png")
+        os.makedirs('tests/screenshots', exist_ok=True)
+        page.screenshot(path='tests/screenshots/test_toggle_controls.png')
+        print("\n✓ Screenshot saved: tests/screenshots/test_toggle_controls.png")
 
         browser.close()
 

@@ -61,8 +61,9 @@ def test_map_panning():
         if map_visible:
             print("  ✓ Map displays correctly on West Coast")
 
-        page.screenshot(path='test_screenshot_west_coast.png')
-        print("  ✓ Screenshot saved: test_screenshot_west_coast.png")
+        os.makedirs('tests/screenshots', exist_ok=True)
+        page.screenshot(path='tests/screenshots/test_west_coast.png')
+        print("  ✓ Screenshot saved: tests/screenshots/test_west_coast.png")
 
         # Step 4 & 5: Pan to East Coast
         print("\n✓ Step 4-5: Panning to East Coast...")
@@ -71,8 +72,9 @@ def test_map_panning():
         if map_visible:
             print("  ✓ Map displays correctly on East Coast")
 
-        page.screenshot(path='test_screenshot_east_coast.png')
-        print("  ✓ Screenshot saved: test_screenshot_east_coast.png")
+        os.makedirs('tests/screenshots', exist_ok=True)
+        page.screenshot(path='tests/screenshots/test_east_coast.png')
+        print("  ✓ Screenshot saved: tests/screenshots/test_east_coast.png")
 
         # Step 6 & 7: Pan to Southern states
         print("\n✓ Step 6-7: Panning to Southern states...")
@@ -81,8 +83,9 @@ def test_map_panning():
         if map_visible:
             print("  ✓ Map displays correctly in Southern states")
 
-        page.screenshot(path='test_screenshot_south.png')
-        print("  ✓ Screenshot saved: test_screenshot_south.png")
+        os.makedirs('tests/screenshots', exist_ok=True)
+        page.screenshot(path='tests/screenshots/test_south.png')
+        print("  ✓ Screenshot saved: tests/screenshots/test_south.png")
 
         # Step 8: Verify smooth panning
         print("\n✓ Step 8: Verifying smooth panning...")

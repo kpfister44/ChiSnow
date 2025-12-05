@@ -181,8 +181,9 @@ def test_marker_clustering():
             print("  ✓ Cluster functionality ready (no clusters at current zoom)")
 
         # Take screenshot
-        page.screenshot(path='test_screenshot_clustering.png')
-        print("\n✓ Screenshot saved: test_screenshot_clustering.png")
+        os.makedirs('tests/screenshots', exist_ok=True)
+        page.screenshot(path='tests/screenshots/test_clustering.png')
+        print("\n✓ Screenshot saved: tests/screenshots/test_clustering.png")
 
         browser.close()
 
