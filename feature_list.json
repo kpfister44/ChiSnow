@@ -252,7 +252,7 @@
       "Step 6: Verify loading states complete when data is ready",
       "Step 7: Verify no loading artifacts remain after completion"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -280,7 +280,7 @@
       "Step 6: Verify coordinates are normalized to consistent format",
       "Step 7: Verify timestamps are normalized to ISO format"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -402,7 +402,7 @@
       "Step 8: Hover over marker on desktop",
       "Step 9: Verify pulse animation on hover"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
