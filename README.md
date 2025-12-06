@@ -38,10 +38,24 @@ cd ChiSnow
 Create a `.env.local` file in the root directory:
 
 ```bash
+# Mapbox API Token (required)
 NEXT_PUBLIC_MAPBOX_TOKEN=your_mapbox_token_here
+
+# NOAA Data Source (optional, defaults to false)
+# Set to 'true' to use real NOAA NWS API data (current snow depth from Illinois stations)
+# Set to 'false' to use mock data for development
+USE_REAL_NOAA_DATA=false
 ```
 
-Get your free Mapbox token at: https://account.mapbox.com/access-tokens/
+**Getting API Keys:**
+- Mapbox token (free): https://account.mapbox.com/access-tokens/
+
+**About USE_REAL_NOAA_DATA:**
+- `false` (default): Uses mock data with 5 Chicagoland area markers for development
+- `true`: Queries 25+ Illinois weather stations for real current snow depth
+  - Shows only stations with snow currently on the ground (0+ inches)
+  - Updates every time the API is called
+  - May be empty if no snow is currently present in Illinois
 
 ### 3. Run the initialization script
 

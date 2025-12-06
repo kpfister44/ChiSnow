@@ -21,18 +21,56 @@ export interface NoaaObservation {
 }
 
 /**
+ * Illinois weather stations for comprehensive state coverage
+ * Includes major airports and regional observation stations
+ */
+const ILLINOIS_STATIONS = [
+  // Chicago Metro Area
+  'KORD', // Chicago O'Hare International
+  'KMDW', // Chicago Midway International
+  'KPWK', // Chicago Executive (Wheeling)
+  'KDPA', // DuPage Airport (West Chicago)
+  'KGYY', // Gary/Chicago International
+  'KLOT', // Lewis University (Romeoville)
+  'KUGN', // Waukegan Regional
+
+  // Northern Illinois
+  'KRFD', // Chicago Rockford International
+  'KDKB', // DeKalb Taylor Municipal
+  'KC09', // Morris Municipal
+
+  // Central Illinois
+  'KPIA', // General Downing - Peoria International
+  'KCMI', // University of Illinois - Willard
+  'KBMI', // Central Illinois Regional (Bloomington)
+  'KDEC', // Decatur Airport
+  'KSPI', // Abraham Lincoln Capital (Springfield)
+  'KIJX', // Jacksonville Municipal
+
+  // Western Illinois (Quad Cities area)
+  'KMLI', // Quad City International (Moline)
+  'KUIN', // Quincy Regional
+  'KGBG', // Galesburg Municipal
+
+  // Southern Illinois
+  'KBLV', // MidAmerica St. Louis (Belleville)
+  'KCPS', // St. Louis Downtown (Cahokia)
+  'KMDH', // Southern Illinois (Carbondale/Murphysboro)
+  'KMWA', // Williamson County Regional (Marion)
+  'KMSV', // Sullivan Regional
+
+  // Eastern Illinois
+  'KDNV', // Vermilion Regional (Danville)
+  'KPRG', // Edgar County (Paris)
+];
+
+/**
  * Fetches recent snowfall observations from NOAA NWS API
- * Focuses on stations in the Chicagoland area
+ * Queries Illinois weather stations for current snow depth
  */
 export async function fetchNoaaNwsSnowfall(): Promise<Measurement[]> {
   try {
-    // For MVP, we'll use a specific observation endpoint for Chicago area
-    // In production, we'd query multiple stations or use a broader area
-    const stations = [
-      'KORD', // O'Hare Airport
-      'KMDW', // Midway Airport
-      'KPWK', // Chicago Executive Airport
-    ];
+    const stations = ILLINOIS_STATIONS;
 
     const measurements: Measurement[] = [];
 
@@ -54,17 +92,20 @@ export async function fetchNoaaNwsSnowfall(): Promise<Measurement[]> {
 
         const data = await response.json();
 
-        // Extract snowfall data if available
-        // NOAA uses various properties for snow data
+        // Extract current snow depth (how much snow is on the ground)
         const snowDepth = data.properties?.snowDepth?.value;
-        const precipitation = data.properties?.precipitationLastHour?.value;
 
-        if (snowDepth !== null && snowDepth !== undefined) {
+        // Only include stations that currently have snow on the ground
+        if (snowDepth !== null && snowDepth !== undefined && snowDepth > 0) {
           const [lon, lat] = data.geometry.coordinates;
+
+          // Convert from meters to inches
+          const snowDepthInches = convertMetersToInches(snowDepth);
+
           measurements.push({
             lat,
             lon,
-            amount: convertMetersToInches(snowDepth),
+            amount: snowDepthInches,
             source: 'NOAA_NWS',
             station: stationId,
             timestamp: data.properties.timestamp,
@@ -85,15 +126,20 @@ export async function fetchNoaaNwsSnowfall(): Promise<Measurement[]> {
 
 /**
  * Fetches gridded snowfall analysis from NOAA
- * This provides broader coverage but may have less granular data
+ * Uses environment variable USE_REAL_NOAA_DATA to toggle between mock and real data
  */
 export async function fetchNoaaGriddedSnowfall(): Promise<Measurement[]> {
   try {
-    // For MVP, we'll return mock data that represents gridded snowfall
-    // The actual NOAA Gridded Snowfall Analysis API requires more complex integration
-    // with MapServer REST API which will be implemented in future iterations
+    // Check feature flag for using real NOAA data
+    const useRealData = process.env.USE_REAL_NOAA_DATA === 'true';
 
-    // Mock data for Chicagoland area with realistic coordinates
+    if (useRealData) {
+      // Use real NWS station data for "gridded" coverage across Illinois
+      // This queries all Illinois stations and returns those with current snow
+      return await fetchNoaaNwsSnowfall();
+    }
+
+    // Mock data for development/testing (Chicagoland area with realistic coordinates)
     const mockGriddedData: Measurement[] = [
       {
         lat: 41.8781,
