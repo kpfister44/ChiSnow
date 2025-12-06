@@ -2837,3 +2837,21 @@ After researching NOAA data sources, chose NWS Observations API because:
 ===========================================
 Session 11 complete - Real NOAA data integrated! 🎉
 ===========================================
+
+## SESSION 12: 2025-12-06
+===========================================
+
+### Refactor: MapServer Client Separation
+
+**Completed:**
+- Split MapServer code into lib/noaa-gridded-client.ts
+- Removed unused NWS station code from lib/noaa-client.ts (305 → 20 lines)
+- Created 11 unit tests for MapServer integration
+- Fixed API route test timeouts (USE_REAL_NOAA_DATA=false)
+- Feature #103 marked passing (current snow depth MVP)
+
+**Test Status:** 32/32 passing
+
+===========================================
+Session 12 complete - MapServer refactor
+===========================================
