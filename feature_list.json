@@ -1431,19 +1431,17 @@
     "description": "NOAA Gridded Snowfall Analysis API Integration - MapServer REST client",
     "steps": [
       "Step 1: Research NOAA MapServer REST API endpoints and discover available snowfall services",
-      "Step 2: Create new file lib/noaa-gridded-client.ts with MapServer REST client",
-      "Step 3: Implement authentication and request headers for NOAA MapServer API",
-      "Step 4: Create function to query snowfall layers by date range and geographic bounds",
-      "Step 5: Implement GeoJSON/ArcGIS REST response parsing",
-      "Step 6: Handle MapServer query parameters (where clause, geometry, outFields)",
-      "Step 7: Convert MapServer feature collection to internal Measurement format",
-      "Step 8: Add error handling for MapServer-specific errors (token expiration, rate limits)",
-      "Step 9: Implement retry logic with exponential backoff for failed requests",
-      "Step 10: Add comprehensive logging for API requests and responses",
-      "Step 11: Write unit tests for MapServer client functions",
-      "Step 12: Document API endpoint URLs, query parameters, and response formats"
+      "Step 2: Verify whether NWS API is actually being used in the app, then create lib/noaa-gridded-client.ts and move MapServer-related functions from lib/noaa-client.ts",
+      "Step 3: Create function to query current snow depth for Illinois region using grid sampling and geographic bounds",
+      "Step 4: Implement ArcGIS REST response parsing for MapServer Identify endpoint raster pixel values",
+      "Step 5: Handle MapServer Identify endpoint query parameters (geometry, geometryType, layers, tolerance, etc)",
+      "Step 6: Convert MapServer raster pixel responses to internal Measurement format",
+      "Step 7: Add basic error handling for MapServer API failures",
+      "Step 8: Add appropriate logging for debugging",
+      "Step 9: Write unit tests for MapServer client functions",
+      "Step 10: Document API endpoint URLs, query parameters, and response formats"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

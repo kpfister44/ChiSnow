@@ -1,15 +1,23 @@
 // ABOUTME: Test suite for /api/snowfall/latest endpoint
 // ABOUTME: Verifies API returns correct data format with required fields
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { GET } from './route';
 import { NextRequest } from 'next/server';
 
 describe('/api/snowfall/latest', () => {
   let mockRequest: NextRequest;
+  const originalEnv = process.env.USE_REAL_NOAA_DATA;
 
   beforeEach(() => {
     mockRequest = new NextRequest('http://localhost:3000/api/snowfall/latest');
+    // Use mock data for tests to avoid slow API calls
+    process.env.USE_REAL_NOAA_DATA = 'false';
+  });
+
+  afterEach(() => {
+    // Restore original environment
+    process.env.USE_REAL_NOAA_DATA = originalEnv;
   });
 
   it('returns 200 status code', async () => {

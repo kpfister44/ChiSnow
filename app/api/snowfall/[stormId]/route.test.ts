@@ -1,12 +1,23 @@
 // ABOUTME: Test suite for /api/snowfall/[stormId] endpoint
 // ABOUTME: Verifies API returns specific storm data by ID
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { GET } from './route';
 import { NextRequest } from 'next/server';
 
 describe('/api/snowfall/[stormId]', () => {
   const testStormId = 'storm-2025-12-04';
+  const originalEnv = process.env.USE_REAL_NOAA_DATA;
+
+  beforeEach(() => {
+    // Use mock data for tests to avoid slow API calls
+    process.env.USE_REAL_NOAA_DATA = 'false';
+  });
+
+  afterEach(() => {
+    // Restore original environment
+    process.env.USE_REAL_NOAA_DATA = originalEnv;
+  });
 
   it('returns 200 status code for valid stormId', async () => {
     const mockRequest = new NextRequest(

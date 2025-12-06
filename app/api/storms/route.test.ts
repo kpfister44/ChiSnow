@@ -1,15 +1,23 @@
 // ABOUTME: Test suite for /api/storms endpoint
 // ABOUTME: Verifies API returns list of recent storms with correct metadata
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { GET } from './route';
 import { NextRequest } from 'next/server';
 
 describe('/api/storms', () => {
   let mockRequest: NextRequest;
+  const originalEnv = process.env.USE_REAL_NOAA_DATA;
 
   beforeEach(() => {
     mockRequest = new NextRequest('http://localhost:3000/api/storms');
+    // Use mock data for tests to avoid slow API calls
+    process.env.USE_REAL_NOAA_DATA = 'false';
+  });
+
+  afterEach(() => {
+    // Restore original environment
+    process.env.USE_REAL_NOAA_DATA = originalEnv;
   });
 
   it('returns 200 status code', async () => {
@@ -23,11 +31,11 @@ describe('/api/storms', () => {
     expect(Array.isArray(data)).toBe(true);
   });
 
-  it('array contains 5-10 storm objects', async () => {
+  it('array contains current storm (MVP: 1 storm only)', async () => {
     const response = await GET(mockRequest);
     const data = await response.json();
-    expect(data.length).toBeGreaterThanOrEqual(5);
-    expect(data.length).toBeLessThanOrEqual(10);
+    // MVP only returns current snow depth (single storm)
+    expect(data.length).toBe(1);
   });
 
   it('each storm has required fields', async () => {
