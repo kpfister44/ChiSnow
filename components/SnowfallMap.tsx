@@ -209,7 +209,7 @@ export default function SnowfallMap({ data }: SnowfallMapProps) {
             coordinates: [m.lon, m.lat]
           },
           properties: {
-            amount: m.amount,
+            amount: Math.round(m.amount * 10) / 10, // Round to 1 decimal place
             station: m.station,
             source: m.source,
             timestamp: m.timestamp,
@@ -297,7 +297,7 @@ export default function SnowfallMap({ data }: SnowfallMapProps) {
             coordinates: [m.lon, m.lat]
           },
           properties: {
-            amount: m.amount,
+            amount: Math.round(m.amount * 10) / 10, // Round to 1 decimal place
             station: m.station,
             source: m.source,
             timestamp: m.timestamp,

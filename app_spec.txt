@@ -23,9 +23,10 @@
       <runtime>Next.js API routes (serverless functions)</runtime>
       <database>None for MVP - fetch fresh from external APIs with in-memory caching</database>
       <external_apis>
-        - NOAA National Weather Service API (api.weather.gov)
-        - NOAA National Gridded Snowfall Analysis (MapServer REST API)
+        - NOAA NOHRSC Snow Analysis MapServer (mapservices.weather.noaa.gov) - Current snow depth via raster data
         - CoCoRaHS API (future - requires access request)
+
+        Note: NOAA NWS API (api.weather.gov) does not provide snow depth data in observations/latest endpoint
       </external_apis>
       <caching>In-memory cache with 2-hour TTL in API routes</caching>
     </backend>
@@ -74,20 +75,24 @@
     </snowfall_visualization>
 
     <storm_selector>
-      - Display most recent snowfall event by default
-      - Dropdown to view last 5-10 storms this season
-      - Storm metadata preview: date, max snowfall, station count
-      - Smooth transitions when switching between storms
-      - Clear indication of currently selected storm
+      - MVP: Displays current snow depth only (single date)
+      - Shows today's date with real-time stats: max snowfall, station count
+      - Future: Will add historical storm selector dropdown
+
+      Note: Currently shows only current snow depth from NOHRSC.
+            Historical snowfall data requires NOAA National Gridded Snowfall Analysis implementation.
     </storm_selector>
 
     <data_management>
-      - API routes proxy external weather APIs
-      - Normalize data from multiple sources into unified format
+      - API routes query NOHRSC Snow Analysis MapServer
+      - Grid sampling across Illinois (0.5° resolution, ~35 mile spacing)
+      - Raster data queried via MapServer Identify endpoint
+      - Snow depth values in meters, converted to inches for display
+      - Marker values rounded to 1 decimal place for readability
       - In-memory caching (2-hour TTL) to reduce API calls
       - Graceful error handling for API failures
-      - Loading states and skeleton loaders
-      - Offline-friendly with cached data
+      - Loading states during data fetch
+      - Toggle between mock data (USE_REAL_NOAA_DATA=false) and real data (true)
     </data_management>
 
     <responsive_design>
@@ -111,27 +116,30 @@
 
   <api_endpoints_summary>
     <snowfall_data>
-      - GET /api/snowfall/latest - Returns most recent snowfall event
-      - GET /api/snowfall/[stormId] - Returns specific historical storm data
-      - GET /api/storms - Returns list of recent storms for dropdown selector
+      - GET /api/snowfall/latest - Returns current snow depth from NOHRSC grid sampling
+      - GET /api/snowfall/[stormId] - Returns current snow depth (MVP: no historical data yet)
+      - GET /api/storms - Returns current snow depth metadata (MVP: single storm only)
     </snowfall_data>
 
     <data_format>
       Response format for snowfall endpoints:
       {
-        stormId: string,
-        date: ISO string,
+        stormId: string,        // Format: "storm-YYYY-MM-DD"
+        date: ISO string,        // Current date/time
         measurements: [
           {
-            lat: number,
-            lon: number,
-            amount: number (inches),
-            source: "NOAA_NWS" | "NOAA_GRIDDED" | "COCORAHS",
-            station: string,
+            lat: number,         // Grid point latitude
+            lon: number,         // Grid point longitude
+            amount: number,      // Snow depth in inches (converted from meters)
+            source: "NOAA_GRIDDED",  // Always NOAA_GRIDDED from NOHRSC
+            station: string,     // Format: "NOHRSC_LAT_LON"
             timestamp: ISO string
           }
         ]
       }
+
+      Note: Measurements are sampled from NOHRSC Snow Analysis raster on 0.5° grid.
+            Values represent CURRENT snow depth on ground, not historical snowfall totals.
     </data_format>
   </api_endpoints_summary>
 

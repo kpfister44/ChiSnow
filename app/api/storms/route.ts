@@ -1,16 +1,17 @@
 // ABOUTME: API route handler for /api/storms endpoint
-// ABOUTME: Returns list of recent storms with metadata
+// ABOUTME: Returns current snow depth data (MVP - no historical storms yet)
 
 import { NextRequest, NextResponse } from 'next/server';
 import { StormMetadata } from '@/types';
 import { cache } from '@/lib/cache';
-import { generateRecentStorms } from '@/lib/storm-generator';
+import { fetchAllNoaaSnowfall } from '@/lib/noaa-client';
 
 const CACHE_KEY = 'storms:list';
 
 /**
  * GET handler for /api/storms
- * Returns a list of recent snowfall events with metadata
+ * Returns current snow depth data only (MVP)
+ * Historical storm data not yet implemented
  */
 export async function GET(request: NextRequest) {
   try {
@@ -25,8 +26,28 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Generate storm list (7 storms by default)
-    const storms = generateRecentStorms(7);
+    // Fetch latest snowfall data to calculate real stats
+    const measurements = await fetchAllNoaaSnowfall();
+
+    // Calculate real stats from measurements
+    const now = new Date();
+    const stormId = `storm-${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+    const totalStations = measurements.length;
+    const maxSnowfall = measurements.length > 0
+      ? Math.round(Math.max(...measurements.map(m => m.amount)) * 10) / 10
+      : 0;
+
+    // Create current storm with real stats
+    const currentStorm: StormMetadata = {
+      id: stormId,
+      date: now.toISOString(),
+      totalStations,
+      maxSnowfall,
+    };
+
+    // MVP: Only return current storm (no historical data yet)
+    const storms = [currentStorm];
 
     // Store in cache (2-hour TTL by default)
     cache.set(CACHE_KEY, storms);
