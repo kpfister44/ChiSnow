@@ -42,3 +42,50 @@ Session 12 complete - MapServer refactor
 ===========================================
 Session 13 complete - Spatial optimization
 ===========================================
+
+===========================================
+
+## SESSION 14: 2025-12-07
+===========================================
+
+### Responsive Layout - Mobile Bottom Sheet & Desktop Sidebar
+
+**Completed:**
+- Fixed JSON syntax error in feature_list.json (trailing comma)
+- Created BottomSheet component for mobile (<768px)
+  * Slides up from bottom with rounded-t-2xl corners and backdrop blur
+  * Drag handle and swipe-to-dismiss gesture support
+  * Displays station details: name, snowfall amount, source, location, timestamp
+- Created Sidebar component for desktop (>1024px)
+  * Fixed 300px width with border-right
+  * Contains storm selector and aggregate statistics
+  * Shows max/avg snowfall, total stations, distribution (heavy/moderate/light)
+  * Footer with data attribution
+- Updated MapWithStormSelector for responsive layout
+  * Flex container with sidebar hidden on mobile (lg:flex)
+  * Mobile storm selector positioned absolutely at top with lg:hidden
+  * BottomSheet state management for mobile marker clicks
+  * Desktop uses sidebar, mobile uses floating storm selector
+- Updated SnowfallMap marker click behavior
+  * Added onMarkerClick callback prop
+  * Triggers callback for mobile bottom sheet display
+  * Shows Mapbox popup on desktop only (>1024px)
+  * Toggle controls repositioned: bottom-right on mobile, top-right on desktop
+- Created browser automation tests
+  * test_verification.py - verifies Test #1 still passes (regression check)
+  * test_mobile_layout.py - verifies Test #21 (mobile layout)
+  * test_desktop_layout.py - verifies Test #22 (desktop layout)
+- Verified with screenshots at both mobile (375x812) and desktop (1920x1080)
+
+**Test Status:** 42/113 passing (71 remaining)
+**Tests Fixed:** #21 (Mobile layout), #22 (Desktop layout)
+
+**Key Implementation Details:**
+- Responsive breakpoints: mobile (<768px), tablet (768-1024px), desktop (>1024px)
+- Mobile: Full-screen map with storm selector at top, bottom sheet for markers
+- Desktop: 300px sidebar + map, popup for markers, controls in top-right
+- Clean separation of concerns: layout in MapWithStormSelector, map logic in SnowfallMap
+
+===========================================
+Session 14 complete - Responsive layout
+===========================================
