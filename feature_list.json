@@ -1461,5 +1461,5 @@
       "Step 12: Validate interpolation accuracy against actual NOAA gridded products"
     ],
     "passes": true
-  },
+  }
 ]
