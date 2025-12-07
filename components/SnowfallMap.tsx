@@ -19,6 +19,14 @@ type VisualizationMode = 'heatmap' | 'markers' | 'both';
 
 interface SnowfallMapProps {
   data: SnowfallEvent;
+  onMarkerClick?: (markerData: {
+    station: string;
+    amount: number;
+    source: string;
+    timestamp: string;
+    lat: number;
+    lon: number;
+  }) => void;
 }
 
 // Color mapping for snowfall amounts
@@ -111,7 +119,7 @@ function createVoronoiPolygons(measurements: SnowfallEvent['measurements'], boun
   return features;
 }
 
-export default function SnowfallMap({ data }: SnowfallMapProps) {
+export default function SnowfallMap({ data, onMarkerClick }: SnowfallMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [vizMode, setVizMode] = useState<VisualizationMode>('both');
@@ -416,7 +424,7 @@ export default function SnowfallMap({ data }: SnowfallMapProps) {
         });
       });
 
-      // Click handler for unclustered points - show popup
+      // Click handler for unclustered points - show popup or trigger callback
       map.current!.on('click', 'unclustered-point', (e) => {
         if (!map.current || !e.features?.length) return;
 
@@ -426,17 +434,32 @@ export default function SnowfallMap({ data }: SnowfallMapProps) {
 
         if (!props) return;
 
-        new mapboxgl.Popup()
-          .setLngLat(coordinates)
-          .setHTML(`
-            <div style="padding: 8px;">
-              <strong>${props.station}</strong><br/>
-              <strong>${props.amount}&quot; snowfall</strong><br/>
-              Source: ${props.source}<br/>
-              ${new Date(props.timestamp).toLocaleString()}
-            </div>
-          `)
-          .addTo(map.current);
+        // Trigger callback for mobile bottom sheet
+        if (onMarkerClick) {
+          onMarkerClick({
+            station: props.station,
+            amount: props.amount,
+            source: props.source,
+            timestamp: props.timestamp,
+            lat: coordinates[1],
+            lon: coordinates[0]
+          });
+        }
+
+        // Show popup on desktop only (>1024px)
+        if (window.innerWidth >= 1024) {
+          new mapboxgl.Popup()
+            .setLngLat(coordinates)
+            .setHTML(`
+              <div style="padding: 8px;">
+                <strong>${props.station}</strong><br/>
+                <strong>${props.amount}&quot; snowfall</strong><br/>
+                Source: ${props.source}<br/>
+                ${new Date(props.timestamp).toLocaleString()}
+              </div>
+            `)
+            .addTo(map.current);
+        }
       });
 
       // Change cursor on hover
@@ -463,8 +486,8 @@ export default function SnowfallMap({ data }: SnowfallMapProps) {
     <div data-testid="snowfall-map" className="relative w-full h-screen">
       <div ref={mapContainer} data-testid="map-container" className="w-full h-full" />
 
-      {/* Toggle controls for visualization mode */}
-      <div className="absolute bottom-8 right-4 bg-white rounded-lg shadow-md border border-gray-300 z-10 flex">
+      {/* Toggle controls for visualization mode - bottom-right on mobile, top-right on desktop */}
+      <div className="absolute bottom-8 right-4 lg:bottom-auto lg:top-4 bg-white rounded-lg shadow-md border border-gray-300 z-10 flex">
         <button
           onClick={() => setVizMode('heatmap')}
           className={`px-4 py-2 text-sm font-semibold transition-colors duration-200 rounded-l-lg ${

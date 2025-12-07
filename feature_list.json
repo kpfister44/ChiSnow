@@ -312,7 +312,7 @@
       "Step 9: Verify bottom sheet has backdrop blur effect",
       "Step 10: Verify bottom sheet has drag handle at top"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
@@ -328,7 +328,7 @@
       "Step 8: Click a marker",
       "Step 9: Verify popup appears directly above marker (not bottom sheet)"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
