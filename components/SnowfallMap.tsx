@@ -35,7 +35,8 @@ function interpolateValue(
   lon: number,
   lat: number,
   measurements: SnowfallEvent['measurements'],
-  power: number = 2
+  power: number = 2,
+  searchRadius?: number
 ): number {
   let weightSum = 0;
   let valueSum = 0;
@@ -50,6 +51,9 @@ function interpolateValue(
     if (distance < 0.001) {
       return m.amount;
     }
+
+    // Skip distant points if radius specified
+    if (searchRadius && distance > searchRadius) continue;
 
     // Inverse distance weighting
     const weight = 1 / Math.pow(distance, power);
@@ -67,7 +71,7 @@ function createVoronoiPolygons(measurements: SnowfallEvent['measurements'], boun
   const [[minX, minY], [maxX, maxY]] = bounds;
 
   // Create dense grid of interpolated points
-  const gridResolution = 0.15; // Grid spacing in degrees (~10 miles)
+  const gridResolution = 0.25; // Grid spacing in degrees (~17 miles)
   const gridPoints: Array<{ lon: number; lat: number; amount: number }> = [];
 
   for (let lon = minX; lon <= maxX; lon += gridResolution) {

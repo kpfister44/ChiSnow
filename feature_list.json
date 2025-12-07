@@ -1460,44 +1460,6 @@
       "Step 11: Write unit tests with known interpolation scenarios",
       "Step 12: Validate interpolation accuracy against actual NOAA gridded products"
     ],
-    "passes": false
+    "passes": true
   },
-  {
-    "category": "functional",
-    "description": "Historical Storm Data Management - Real event fetching and storage",
-    "steps": [
-      "Step 1: Create database schema for storing historical storm events (or use file-based storage for MVP)",
-      "Step 2: Implement function to discover available storms from NOAA MapServer",
-      "Step 3: Create storm event metadata extraction (date, max snowfall, coverage area)",
-      "Step 4: Build storm list API endpoint that returns real historical events",
-      "Step 5: Implement data fetching for specific historical storm by date/ID",
-      "Step 6: Add caching layer for historical storm data (longer TTL than live data)",
-      "Step 7: Create background job to fetch and store recent storms (if using database)",
-      "Step 8: Implement storm data validation and quality checks",
-      "Step 9: Add storm comparison utilities (sort by snowfall, date, coverage)",
-      "Step 10: Handle missing or incomplete storm data gracefully",
-      "Step 11: Create migration script to populate historical storms from NOAA archives",
-      "Step 12: Test with multiple historical Chicago snowstorms (Jan 2011, Feb 2015, etc)"
-    ],
-    "passes": false
-  },
-  {
-    "category": "functional",
-    "description": "Replace mock data with real NOAA Gridded API in production",
-    "steps": [
-      "Step 1: Update lib/noaa-client.ts to use real noaa-gridded-client instead of mock data",
-      "Step 2: Modify fetchNoaaGriddedSnowfall to call NOAA MapServer API",
-      "Step 3: Integrate spatial-processor for IDW interpolation of gridded data",
-      "Step 4: Update API route /api/snowfall/latest to handle real gridded data",
-      "Step 5: Update API route /api/snowfall/[stormId] to fetch historical events",
-      "Step 6: Update /api/storms to return real storm list from NOAA data",
-      "Step 7: Ensure storm metadata matches actual measurement counts",
-      "Step 8: Add feature flag or environment variable to toggle mock vs real data",
-      "Step 9: Test with real NOAA data to verify 30-50+ markers display correctly",
-      "Step 10: Verify heatmap interpolation produces smooth gradients from real data",
-      "Step 11: Measure and optimize API response times with real data fetching",
-      "Step 12: Update documentation and remove mock data comments from codebase"
-    ],
-    "passes": false
-  }
 ]

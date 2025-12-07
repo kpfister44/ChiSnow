@@ -195,8 +195,53 @@ describe('NOAA Client - MapServer Integration', () => {
       const measurements = await fetchNoaaGriddedSnowfall();
 
       if (measurements.length > 0) {
-        expect(measurements[0].station).toMatch(/^NOHRSC_\d+\.\d+_-\d+\.\d+$/);
+        expect(measurements[0].station).toMatch(/^NOHRSC_/);
       }
+    });
+
+    it('queries 20 strategic points in parallel', async () => {
+      process.env.USE_REAL_NOAA_DATA = 'true';
+      process.env.USE_STRATEGIC_SAMPLING = 'true';
+
+      global.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ results: [{ attributes: { 'Service Pixel Value': '0.254' } }] }),
+      });
+
+      const measurements = await fetchNoaaGriddedSnowfall();
+
+      expect(global.fetch).toHaveBeenCalledTimes(20); // 20 strategic points
+      expect(measurements.length).toBeGreaterThan(20); // Includes interpolated
+    });
+
+    it('handles partial failures gracefully', async () => {
+      process.env.USE_REAL_NOAA_DATA = 'true';
+
+      let callCount = 0;
+      global.fetch = vi.fn().mockImplementation(() => {
+        callCount++;
+        if (callCount <= 15) {
+          return Promise.resolve({ ok: true, json: async () => ({ results: [{ attributes: { 'Service Pixel Value': '0.1' } }] }) });
+        }
+        return Promise.reject(new Error('Network error'));
+      });
+
+      const measurements = await fetchNoaaGriddedSnowfall();
+      expect(measurements.length).toBeGreaterThan(0); // Still returns results
+    });
+
+    it('falls back to grid when USE_STRATEGIC_SAMPLING=false', async () => {
+      process.env.USE_REAL_NOAA_DATA = 'true';
+      process.env.USE_STRATEGIC_SAMPLING = 'false';
+
+      global.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ results: [{ attributes: { 'Service Pixel Value': '0.1' } }] }),
+      });
+
+      await fetchNoaaGriddedSnowfall();
+
+      expect(global.fetch).toHaveBeenCalledTimes(108); // Old grid behavior
     });
   });
 

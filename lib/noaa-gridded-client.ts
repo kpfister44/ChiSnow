@@ -2,6 +2,8 @@
 // ABOUTME: Queries raster data via MapServer Identify endpoint with grid sampling across Illinois
 
 import { Measurement } from '@/types';
+import { STRATEGIC_SAMPLE_POINTS, USE_STRATEGIC_SAMPLING } from './sampling-config';
+import { expandSamplesWithIDW } from './spatial-interpolator';
 
 /**
  * NOAA NOHRSC MapServer base URL
@@ -104,67 +106,88 @@ function getMockGriddedData(): Measurement[] {
 
 /**
  * Fetches snow depth from NOHRSC MapServer for Illinois region
- * Creates a grid of sample points and queries the raster data at each point
+ * Uses strategic sampling + parallel queries + backend interpolation
  *
  * @returns Array of Measurement objects for points with snow > 0 inches
  */
 async function fetchNohrscSnowDepth(): Promise<Measurement[]> {
-  const measurements: Measurement[] = [];
-  let totalPoints = 0;
-  let pointsWithSnow = 0;
-  let failedPoints = 0;
-
-  console.log('[NOHRSC] Starting grid sampling across Illinois');
-  console.log(
-    `[NOHRSC] Grid bounds: lat ${ILLINOIS_BOUNDS.minLat}-${ILLINOIS_BOUNDS.maxLat}, lon ${ILLINOIS_BOUNDS.minLon}-${ILLINOIS_BOUNDS.maxLon}`
-  );
-  console.log(`[NOHRSC] Grid spacing: ${GRID_SPACING_DEGREES}° (~35 miles)`);
-
   try {
-    // Generate grid points across Illinois
-    for (
-      let lat = ILLINOIS_BOUNDS.minLat;
-      lat <= ILLINOIS_BOUNDS.maxLat;
-      lat += GRID_SPACING_DEGREES
-    ) {
-      for (
-        let lon = ILLINOIS_BOUNDS.minLon;
-        lon <= ILLINOIS_BOUNDS.maxLon;
-        lon += GRID_SPACING_DEGREES
-      ) {
-        totalPoints++;
-        try {
-          // Query NOHRSC MapServer at this coordinate
-          const snowDepth = await queryNohrscPoint(lon, lat);
+    // Step 1: Select sample points (strategic or fallback to grid)
+    const useStrategicSampling = process.env.USE_STRATEGIC_SAMPLING !== 'false';
+    const samplePoints = useStrategicSampling
+      ? STRATEGIC_SAMPLE_POINTS
+      : generateGridPoints();
 
-          // Only include points with snow > 0
-          if (snowDepth > 0) {
-            pointsWithSnow++;
-            measurements.push({
-              lat,
-              lon,
-              amount: snowDepth,
-              source: 'NOAA_GRIDDED',
-              station: `NOHRSC_${lat.toFixed(2)}_${lon.toFixed(2)}`,
-              timestamp: new Date().toISOString(),
-            });
-          }
-        } catch (error) {
-          failedPoints++;
-          // Skip points that fail to query - don't log each one to avoid spam
-          continue;
+    console.log(`[NOHRSC] Querying ${samplePoints.length} strategic points in parallel`);
+    const startTime = Date.now();
+
+    // Step 2: Query all points in parallel
+    const samplePromises = samplePoints.map(async (point) => {
+      try {
+        const snowDepth = await queryNohrscPoint(point.lon, point.lat);
+
+        if (snowDepth > 0) {
+          return {
+            lat: point.lat,
+            lon: point.lon,
+            amount: snowDepth,
+            source: 'NOAA_GRIDDED' as const,
+            station: `NOHRSC_${point.name}`,
+            timestamp: new Date().toISOString(),
+          };
         }
+        return null;
+      } catch (error) {
+        console.warn(`[NOHRSC] Failed to query ${point.name}:`, error);
+        return null;
       }
+    });
+
+    const results = await Promise.all(samplePromises);
+    const rawSamples = results.filter((m) => m !== null) as Measurement[];
+
+    const queryTime = ((Date.now() - startTime) / 1000).toFixed(2);
+    console.log(`[NOHRSC] Query complete in ${queryTime}s: ${rawSamples.length}/${samplePoints.length} with snow`);
+
+    // Step 3: Backend interpolation (expand 20 → ~60 grid points)
+    if (rawSamples.length === 0) {
+      console.log('[NOHRSC] No snow detected');
+      return [];
     }
 
-    console.log(
-      `[NOHRSC] Grid sampling complete: ${pointsWithSnow}/${totalPoints} points with snow, ${failedPoints} failed`
+    console.log('[NOHRSC] Performing backend interpolation...');
+    const interpolatedGrid = expandSamplesWithIDW(
+      rawSamples,
+      0.5, // 0.5° spacing (~35 miles)
+      ILLINOIS_BOUNDS
     );
-    return measurements;
+
+    console.log(`[NOHRSC] Expanded ${rawSamples.length} samples → ${interpolatedGrid.length} grid points`);
+
+    // Return raw samples + interpolated grid
+    return [...rawSamples, ...interpolatedGrid];
+
   } catch (error) {
-    console.error('[NOHRSC] Error during grid sampling:', error);
+    console.error('[NOHRSC] Error during sampling:', error);
     return [];
   }
+}
+
+/**
+ * Fallback: Generate old-style uniform grid (only if USE_STRATEGIC_SAMPLING=false)
+ */
+function generateGridPoints() {
+  const points = [];
+  for (let lat = ILLINOIS_BOUNDS.minLat; lat <= ILLINOIS_BOUNDS.maxLat; lat += GRID_SPACING_DEGREES) {
+    for (let lon = ILLINOIS_BOUNDS.minLon; lon <= ILLINOIS_BOUNDS.maxLon; lon += GRID_SPACING_DEGREES) {
+      points.push({
+        lat, lon,
+        name: `GRID_${lat.toFixed(2)}_${lon.toFixed(2)}`,
+        priority: 'low' as const
+      });
+    }
+  }
+  return points;
 }
 
 /**
