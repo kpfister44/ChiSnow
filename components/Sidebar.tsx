@@ -1,5 +1,5 @@
 // ABOUTME: Desktop sidebar component containing storm selector and statistics
-// ABOUTME: Fixed 300px width, displays on screens >1024px
+// ABOUTME: Fixed 300px width, displays on tablets and desktop (screens >768px)
 
 'use client';
 
@@ -30,7 +30,7 @@ export default function Sidebar({
   const lightSnow = snowfallData.measurements.filter(m => m.amount < 2).length;
 
   return (
-    <div className="hidden lg:flex lg:flex-col w-[300px] bg-white border-r border-gray-200 h-screen">
+    <div className="hidden md:flex md:flex-col w-[300px] bg-white border-r border-gray-200 h-screen">
       {/* Storm Selector */}
       <div className="p-6 border-b border-gray-200">
         <StormSelector

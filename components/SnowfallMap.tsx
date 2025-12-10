@@ -486,8 +486,8 @@ export default function SnowfallMap({ data, onMarkerClick }: SnowfallMapProps) {
     <div data-testid="snowfall-map" className="relative w-full h-screen">
       <div ref={mapContainer} data-testid="map-container" className="w-full h-full" />
 
-      {/* Toggle controls for visualization mode - bottom-right on mobile, top-right on desktop */}
-      <div className="absolute bottom-8 right-4 lg:bottom-auto lg:top-4 bg-white rounded-lg shadow-md border border-gray-300 z-10 flex">
+      {/* Toggle controls for visualization mode - bottom-right on mobile, top-right on tablet/desktop */}
+      <div className="absolute bottom-8 right-4 md:bottom-auto md:top-4 bg-white rounded-lg shadow-md border border-gray-300 z-10 flex">
         <button
           onClick={() => setVizMode('heatmap')}
           className={`px-4 py-2 text-sm font-semibold transition-colors duration-200 rounded-l-lg ${

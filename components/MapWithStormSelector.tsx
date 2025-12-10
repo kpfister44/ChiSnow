@@ -53,7 +53,7 @@ export default function MapWithStormSelector({
 
   return (
     <div className="flex h-screen">
-      {/* Desktop Sidebar (>1024px) */}
+      {/* Desktop & Tablet Sidebar (>768px) */}
       <Sidebar
         storms={storms}
         selectedStormId={selectedStormId}
@@ -63,8 +63,8 @@ export default function MapWithStormSelector({
 
       {/* Main map area */}
       <div className="relative flex-1 h-screen">
-        {/* Mobile Storm Selector (<1024px) - positioned absolutely at top */}
-        <div className="absolute top-0 left-0 right-0 z-10 lg:hidden">
+        {/* Mobile Storm Selector (<768px) - positioned absolutely at top */}
+        <div className="absolute top-0 left-0 right-0 z-10 md:hidden">
           <StormSelector
             storms={storms}
             selectedStormId={selectedStormId}
