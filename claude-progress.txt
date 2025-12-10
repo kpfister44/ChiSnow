@@ -89,3 +89,40 @@ Session 13 complete - Spatial optimization
 ===========================================
 Session 14 complete - Responsive layout
 ===========================================
+
+===========================================
+
+## SESSION 15: 2025-12-09
+===========================================
+
+### Tablet Layout Support - Responsive Breakpoint Optimization
+
+**Completed:**
+- Verified no regressions from Session 14 (Tests #1, #21, #22 still passing)
+- Identified gap: tablets (768-1024px) were using mobile layout instead of sidebar
+- Changed responsive breakpoints from lg: (1024px) to md: (768px) throughout
+- Updated Sidebar.tsx: Changed `hidden lg:flex` to `hidden md:flex`
+- Updated MapWithStormSelector.tsx: Changed `lg:hidden` to `md:hidden` for mobile storm selector
+- Updated SnowfallMap.tsx: Changed toggle controls from `lg:` to `md:` breakpoint
+- Created test_tablet_layout.py for automated verification at 768px and 1024px
+- Verified tablet layout works correctly:
+  * Sidebar visible on tablets (like desktop)
+  * Mobile storm selector hidden on tablets
+  * Toggle controls at top-right (like desktop)
+  * No horizontal scrolling
+  * No console errors
+
+**Test Status:** 34/104 passing (70 remaining)
+**Tests Fixed:** #23 (Tablet layout)
+
+**Key Implementation Details:**
+- Tablets (768-1024px) now use desktop-style sidebar layout
+- Consistent breakpoints: mobile (<768px), tablet/desktop (≥768px)
+- All three responsive layouts working correctly:
+  * Mobile: Full-screen map, mobile storm selector, bottom sheet
+  * Tablet: Sidebar + map, toggle controls at top-right
+  * Desktop: Sidebar + map, toggle controls at top-right
+
+===========================================
+Session 15 complete - Tablet layout support
+===========================================
