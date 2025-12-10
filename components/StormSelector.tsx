@@ -48,7 +48,7 @@ export default function StormSelector({
           <select
             value={selectedStormId}
             onChange={(e) => onStormChange(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-3 py-3 md:py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             {storms.map((storm) => (
               <option key={storm.id} value={storm.id}>

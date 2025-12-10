@@ -374,7 +374,14 @@ export default function SnowfallMap({ data, onMarkerClick }: SnowfallMapProps) {
         filter: ['!', ['has', 'point_count']],
         paint: {
           'circle-color': ['get', 'color'],
-          'circle-radius': 20,
+          'circle-radius': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            0, 22,   // 44px diameter at low zoom (mobile-optimized)
+            10, 22,  // 44px diameter at medium zoom
+            15, 16   // 32px diameter at high zoom (desktop when zoomed in)
+          ],
           'circle-stroke-width': 2,
           'circle-stroke-color': '#ffffff',
           'circle-opacity': 1,
@@ -490,7 +497,7 @@ export default function SnowfallMap({ data, onMarkerClick }: SnowfallMapProps) {
       <div className="absolute bottom-8 right-4 md:bottom-auto md:top-4 bg-white rounded-lg shadow-md border border-gray-300 z-10 flex">
         <button
           onClick={() => setVizMode('heatmap')}
-          className={`px-4 py-2 text-sm font-semibold transition-colors duration-200 rounded-l-lg ${
+          className={`px-4 py-3 md:py-2 text-sm font-semibold transition-colors duration-200 rounded-l-lg ${
             vizMode === 'heatmap'
               ? 'bg-blue-600 text-white'
               : 'bg-white text-gray-800 hover:bg-gray-50'
@@ -502,7 +509,7 @@ export default function SnowfallMap({ data, onMarkerClick }: SnowfallMapProps) {
         </button>
         <button
           onClick={() => setVizMode('markers')}
-          className={`px-4 py-2 text-sm font-semibold transition-colors duration-200 border-x border-gray-300 ${
+          className={`px-4 py-3 md:py-2 text-sm font-semibold transition-colors duration-200 border-x border-gray-300 ${
             vizMode === 'markers'
               ? 'bg-blue-600 text-white'
               : 'bg-white text-gray-800 hover:bg-gray-50'
@@ -514,7 +521,7 @@ export default function SnowfallMap({ data, onMarkerClick }: SnowfallMapProps) {
         </button>
         <button
           onClick={() => setVizMode('both')}
-          className={`px-4 py-2 text-sm font-semibold transition-colors duration-200 rounded-r-lg ${
+          className={`px-4 py-3 md:py-2 text-sm font-semibold transition-colors duration-200 rounded-r-lg ${
             vizMode === 'both'
               ? 'bg-blue-600 text-white'
               : 'bg-white text-gray-800 hover:bg-gray-50'
@@ -529,7 +536,7 @@ export default function SnowfallMap({ data, onMarkerClick }: SnowfallMapProps) {
       {/* Reset to Chicago button */}
       <button
         onClick={resetToChicago}
-        className="absolute bottom-8 left-4 bg-white hover:bg-gray-50 text-gray-800 font-semibold py-2 px-4 border border-gray-300 rounded-lg shadow-md transition-colors duration-200 z-10"
+        className="absolute bottom-8 left-4 bg-white hover:bg-gray-50 text-gray-800 font-semibold py-3 md:py-2 px-4 border border-gray-300 rounded-lg shadow-md transition-colors duration-200 z-10"
         data-testid="reset-chicago-btn"
         aria-label="Reset to Chicago"
       >
