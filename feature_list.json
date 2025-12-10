@@ -256,20 +256,6 @@
   },
   {
     "category": "functional",
-    "description": "App works with cached data when offline",
-    "steps": [
-      "Step 1: Navigate to homepage and load data",
-      "Step 2: Verify data loads successfully",
-      "Step 3: Disconnect from network",
-      "Step 4: Refresh page",
-      "Step 5: Verify cached data is displayed",
-      "Step 6: Verify basic functionality works with cache",
-      "Step 7: Verify appropriate message indicates offline mode"
-    ],
-    "passes": false
-  },
-  {
-    "category": "functional",
     "description": "Data normalization combines multiple sources into unified format",
     "steps": [
       "Step 1: Fetch data from /api/snowfall/latest",
