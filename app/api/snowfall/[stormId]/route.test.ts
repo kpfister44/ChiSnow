@@ -23,7 +23,7 @@ describe('/api/snowfall/[stormId]', () => {
     const mockRequest = new NextRequest(
       `http://localhost:3000/api/snowfall/${testStormId}`
     );
-    const response = await GET(mockRequest, { params: { stormId: testStormId } });
+    const response = await GET(mockRequest, { params: Promise.resolve({ stormId: testStormId }) });
     expect(response.status).toBe(200);
   });
 
@@ -31,7 +31,7 @@ describe('/api/snowfall/[stormId]', () => {
     const mockRequest = new NextRequest(
       `http://localhost:3000/api/snowfall/${testStormId}`
     );
-    const response = await GET(mockRequest, { params: { stormId: testStormId } });
+    const response = await GET(mockRequest, { params: Promise.resolve({ stormId: testStormId }) });
     const data = await response.json();
 
     // Should have same structure as /api/snowfall/latest
@@ -48,7 +48,7 @@ describe('/api/snowfall/[stormId]', () => {
     const mockRequest = new NextRequest(
       `http://localhost:3000/api/snowfall/${testStormId}`
     );
-    const response = await GET(mockRequest, { params: { stormId: testStormId } });
+    const response = await GET(mockRequest, { params: Promise.resolve({ stormId: testStormId }) });
     const data = await response.json();
 
     expect(data.stormId).toBe(testStormId);
@@ -58,7 +58,7 @@ describe('/api/snowfall/[stormId]', () => {
     const mockRequest = new NextRequest(
       `http://localhost:3000/api/snowfall/${testStormId}`
     );
-    const response = await GET(mockRequest, { params: { stormId: testStormId } });
+    const response = await GET(mockRequest, { params: Promise.resolve({ stormId: testStormId }) });
     const data = await response.json();
 
     expect(data.measurements.length).toBeGreaterThan(0);
@@ -77,7 +77,7 @@ describe('/api/snowfall/[stormId]', () => {
     const mockRequest = new NextRequest(
       `http://localhost:3000/api/snowfall/${invalidStormId}`
     );
-    const response = await GET(mockRequest, { params: { stormId: invalidStormId } });
+    const response = await GET(mockRequest, { params: Promise.resolve({ stormId: invalidStormId }) });
     expect(response.status).toBe(404);
   });
 });

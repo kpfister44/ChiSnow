@@ -502,7 +502,7 @@
       "Step 5: Wait for content to load",
       "Step 6: Verify smooth transition from skeleton to content"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
@@ -517,7 +517,7 @@
       "Step 7: Set viewport to 1025px width",
       "Step 8: Verify desktop layout is active"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
@@ -555,7 +555,7 @@
       "Step 6: Verify no type errors",
       "Step 7: Verify proper type inference throughout codebase"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
