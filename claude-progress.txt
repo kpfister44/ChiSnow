@@ -199,3 +199,35 @@ Session 15 complete - Responsive improvements
 ===========================================
 Session 16 complete - Bottom sheet verification
 ===========================================
+
+===========================================
+
+## SESSION 16 (continued): 2025-12-10
+===========================================
+
+### Offline Feature Removal
+
+**Actions Taken:**
+- Investigated Test #19 (offline caching) requirements
+- Attempted implementation with localStorage + browser cache approach
+- Discovered fundamental limitation: page refresh while offline requires Service Worker
+- Per Kyle's direction, removed offline feature entirely from requirements
+- Deleted all offline-related code:
+  * lib/hooks/useOnlineStatus.ts
+  * components/OfflineIndicator.tsx
+  * components/HomePageClient.tsx
+  * test_offline_caching.py
+- Reverted changes to:
+  * components/MapWithStormSelector.tsx
+  * app/page.tsx
+- Removed Test #19 from feature_list.json
+- Verified app still works correctly with Test #1
+
+**Test Status:** 36/103 passing (67 remaining)
+**Note:** Test count reduced from 104 to 103 after removing Test #19
+
+**Decision:** Offline functionality not needed for this project
+
+===========================================
+Session 16 complete
+===========================================
