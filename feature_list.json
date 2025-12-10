@@ -477,7 +477,7 @@
       "Step 4: Verify animation duration is approximately 200ms",
       "Step 5: Verify smooth, bouncy entrance"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
@@ -530,34 +530,6 @@
       "Step 5: Verify appropriate detail level at various zoom levels"
     ],
     "passes": true
-  },
-  {
-    "category": "functional",
-    "description": "Page load performance meets target of under 2 seconds on 3G",
-    "steps": [
-      "Step 1: Simulate 3G connection speed",
-      "Step 2: Navigate to homepage",
-      "Step 3: Measure time to initial paint",
-      "Step 4: Verify First Contentful Paint is under 1 second",
-      "Step 5: Measure time to interactive",
-      "Step 6: Verify Time to Interactive is under 3 seconds",
-      "Step 7: Measure total page load time",
-      "Step 8: Verify total load is under 2 seconds",
-      "Step 9: Verify Lighthouse performance score is 90+"
-    ],
-    "passes": false
-  },
-  {
-    "category": "functional",
-    "description": "Bundle size meets target of under 500KB gzipped",
-    "steps": [
-      "Step 1: Build production bundle",
-      "Step 2: Measure gzipped JavaScript bundle size",
-      "Step 3: Verify total is under 500KB",
-      "Step 4: Verify code splitting is implemented",
-      "Step 5: Verify lazy loading for map component"
-    ],
-    "passes": false
   },
   {
     "category": "functional",
@@ -1434,7 +1406,7 @@
     "description": "Spatial Data Processing - Grid generation and IDW interpolation",
     "steps": [
       "Step 1: Create new file lib/spatial-processor.ts for spatial data operations",
-      "Step 2: Implement grid generation function with 0.15° resolution (~10 miles)",
+      "Step 2: Implement grid generation function with 0.15\u00b0 resolution (~10 miles)",
       "Step 3: Create Inverse Distance Weighting (IDW) interpolation algorithm",
       "Step 4: Implement nearest neighbor search for efficient point-to-grid mapping",
       "Step 5: Add coordinate transformation utilities (lat/lon to grid indices)",

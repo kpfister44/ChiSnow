@@ -123,6 +123,71 @@ export default function SnowfallMap({ data, onMarkerClick }: SnowfallMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [vizMode, setVizMode] = useState<VisualizationMode>('both');
+  const isAnimatingRef = useRef(false);
+
+  // Spring animation for marker pop-in when zooming
+  const triggerMarkerPopInAnimation = () => {
+    if (!map.current || isAnimatingRef.current) return;
+
+    isAnimatingRef.current = true;
+    const startTime = performance.now();
+    const duration = 200; // 200ms as per design spec
+
+    // Ease-out-back function for spring/bouncy effect
+    const easeOutBack = (t: number): number => {
+      const c1 = 1.70158;
+      const c3 = c1 + 1;
+      return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+    };
+
+    const animate = (currentTime: number) => {
+      if (!map.current) {
+        isAnimatingRef.current = false;
+        return;
+      }
+
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const scale = easeOutBack(progress);
+
+      // Apply spring scale to marker radius
+      try {
+        map.current.setPaintProperty('unclustered-point', 'circle-radius', [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          0, 22 * scale,
+          10, 22 * scale,
+          15, 16 * scale
+        ]);
+      } catch (e) {
+        // Layer might not exist yet, ignore
+      }
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        // Animation complete - reset to normal size
+        isAnimatingRef.current = false;
+        if (map.current) {
+          try {
+            map.current.setPaintProperty('unclustered-point', 'circle-radius', [
+              'interpolate',
+              ['linear'],
+              ['zoom'],
+              0, 22,
+              10, 22,
+              15, 16
+            ]);
+          } catch (e) {
+            // Layer might not exist, ignore
+          }
+        }
+      }
+    };
+
+    requestAnimationFrame(animate);
+  };
 
   // Reset map to Chicago default view
   const resetToChicago = () => {
@@ -382,10 +447,11 @@ export default function SnowfallMap({ data, onMarkerClick }: SnowfallMapProps) {
             10, 22,  // 44px diameter at medium zoom
             15, 16   // 32px diameter at high zoom (desktop when zoomed in)
           ],
+          'circle-radius-transition': { duration: 200, delay: 0 }, // 200ms spring-like animation
           'circle-stroke-width': 2,
           'circle-stroke-color': '#ffffff',
           'circle-opacity': 1,
-          'circle-opacity-transition': { duration: 300 }
+          'circle-opacity-transition': { duration: 200 } // Match radius animation
         }
       });
 
@@ -482,6 +548,14 @@ export default function SnowfallMap({ data, onMarkerClick }: SnowfallMapProps) {
       map.current!.on('mouseleave', 'unclustered-point', () => {
         if (map.current) map.current.getCanvas().style.cursor = '';
       });
+
+      // Trigger spring animation when zoom ends (new markers may appear)
+      map.current!.on('zoomend', () => {
+        triggerMarkerPopInAnimation();
+      });
+
+      // Trigger initial spring animation when markers first load
+      triggerMarkerPopInAnimation();
     });
 
     return () => {
