@@ -32,7 +32,7 @@ def test_touch_targets():
         page.on('pageerror', lambda exc: page_errors.append(str(exc)))
 
         print("Step 1: Navigate to homepage on mobile...")
-        page.goto('http://localhost:3001', wait_until='networkidle')
+        page.goto('http://localhost:3000', wait_until='networkidle')
         page.wait_for_timeout(4000)  # Wait for map and buttons to fully render
         print(f"  ✓ Loaded with viewport: 375x812 (mobile)")
 

@@ -418,7 +418,7 @@
       "Step 8: Swipe down to dismiss",
       "Step 9: Verify smooth slide-down animation"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "style",
