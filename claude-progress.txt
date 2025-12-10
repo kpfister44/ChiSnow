@@ -231,3 +231,41 @@ Session 16 complete - Bottom sheet verification
 ===========================================
 Session 16 complete
 ===========================================
+
+===========================================
+
+## SESSION 17: 2025-12-10
+===========================================
+
+### Marker Pop-In Spring Animation
+
+**Completed:**
+- Ran verification tests to ensure no regressions (Test #1 passing)
+- Implemented marker pop-in spring animation (Test #32)
+  * Added 200ms spring animation using easeOutBack function
+  * Triggers on zoomend events and initial map load
+  * Animates circle-radius with smooth, bouncy effect
+  * Uses requestAnimationFrame for smooth 60fps animation
+- Created test_marker_pop_in.py for automated verification
+- Verified animation works correctly with browser automation
+- Updated feature_list.json: marked Test #32 as passing
+
+**Test Status:** 37/103 passing (66 remaining)
+**Tests Fixed:** #32 (Marker pop-in animation)
+
+**Key Implementation Details:**
+- Spring animation uses easeOutBack easing function (c1 = 1.70158)
+- Animation duration: 200ms as specified in design system
+- Scales markers from 0 → overshoot (120%) → settle (100%)
+- Applied to unclustered-point layer circle-radius property
+- Triggered automatically when zooming reveals new markers
+- No performance impact - uses efficient RAF animation loop
+
+**Next Steps:**
+- Test #35: Skeleton loaders display during content loading
+- Test #33: Toggle controls positioned correctly on different devices
+- Test #34: Map uses Mapbox Streets base layer style
+
+===========================================
+Session 17 complete - Marker animations
+===========================================
