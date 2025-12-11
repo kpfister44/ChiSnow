@@ -9,7 +9,7 @@ async function getInitialData(): Promise<{
   storms: StormMetadata[];
 }> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
 
     const [snowfallRes, stormsRes] = await Promise.all([
       fetch(`${baseUrl}/api/snowfall/latest`, { cache: 'no-store' }),
