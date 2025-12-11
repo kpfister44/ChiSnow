@@ -581,7 +581,7 @@
       "Step 4: Verify Tailwind utilities work in components",
       "Step 5: Build project and verify CSS is generated correctly"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -593,7 +593,7 @@
       "Step 4: Verify map controls are functional",
       "Step 5: Verify no console errors related to Mapbox"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
