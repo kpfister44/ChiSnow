@@ -82,6 +82,20 @@ else
     echo ""
 fi
 
+# Kill any existing server on port 3000
+echo "Checking for existing server on port 3000..."
+PORT_PID=$(lsof -ti:3000 2>/dev/null || true)
+if [ ! -z "$PORT_PID" ]; then
+    echo "⚠️  Found existing process on port 3000 (PID: $PORT_PID)"
+    echo "Stopping existing server..."
+    kill $PORT_PID 2>/dev/null || true
+    sleep 1
+    echo "✓ Existing server stopped"
+else
+    echo "✓ Port 3000 is available"
+fi
+echo ""
+
 # Start development server
 echo "======================================"
 echo "Starting Development Server"
