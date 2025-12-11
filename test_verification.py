@@ -22,7 +22,7 @@ def verify_initial_page_load():
         page.on("pageerror", lambda err: errors.append(str(err)))
 
         print("Step 1: Navigate to ChiSnow homepage...")
-        page.goto('http://localhost:3001', wait_until='load')
+        page.goto('http://localhost:3000', wait_until='load')
 
         print("Step 2: Wait for page to load...")
         page.wait_for_timeout(3000)  # Give map time to initialize

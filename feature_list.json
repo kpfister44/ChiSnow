@@ -630,7 +630,7 @@
       "Step 4: Verify link to return to homepage",
       "Step 5: Verify styling is consistent with site design"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
