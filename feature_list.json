@@ -618,7 +618,7 @@
       "Step 5: Verify app doesn't crash completely",
       "Step 6: Verify error is logged for debugging"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -723,7 +723,7 @@
       "Step 5: Verify timezone is indicated or localized",
       "Step 6: Verify relative time for recent measurements (e.g., '2 hours ago')"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

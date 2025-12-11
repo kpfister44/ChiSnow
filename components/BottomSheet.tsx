@@ -4,6 +4,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { formatTimestamp } from '@/lib/format-date';
 
 export interface MarkerData {
   station: string;
@@ -120,7 +121,7 @@ export default function BottomSheet({ data, onClose }: BottomSheetProps) {
             <div>
               <p className="text-sm text-gray-500">Measured</p>
               <p className="text-base text-gray-900">
-                {new Date(data.timestamp).toLocaleString()}
+                {formatTimestamp(data.timestamp)}
               </p>
             </div>
           </div>

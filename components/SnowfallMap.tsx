@@ -8,6 +8,7 @@ import mapboxgl from 'mapbox-gl';
 import { Delaunay } from 'd3-delaunay';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import type { SnowfallEvent } from '@/types';
+import { formatTimestamp } from '@/lib/format-date';
 
 declare global {
   interface Window {
@@ -528,7 +529,7 @@ export default function SnowfallMap({ data, onMarkerClick }: SnowfallMapProps) {
                 <strong>${props.station}</strong><br/>
                 <strong>${props.amount}&quot; snowfall</strong><br/>
                 Source: ${props.source}<br/>
-                ${new Date(props.timestamp).toLocaleString()}
+                ${formatTimestamp(props.timestamp)}
               </div>
             `)
             .addTo(map.current);
