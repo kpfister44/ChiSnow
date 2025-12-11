@@ -399,3 +399,68 @@ Session 18 complete - Bug fix + 3 tests verified
 ===========================================
 Session 19 complete - 404 page implementation
 ===========================================
+
+===========================================
+
+## SESSION 19 (continued): 2025-12-11
+===========================================
+
+### Additional Features: Error Boundary + Timestamp Formatting
+
+**Test #43: Error Boundary Implementation**
+- Created components/ErrorBoundary.tsx
+  * React class component with getDerivedStateFromError and componentDidCatch
+  * User-friendly error message with "Something Went Wrong" heading
+  * Red warning icon for visual feedback
+  * "Reload Page" button for recovery
+  * Development mode: shows detailed error stack trace
+  * Production mode: hides technical details
+  * Logs errors to console via componentDidCatch
+- Integrated into app/layout.tsx to wrap entire application
+- Tested with test_error_boundary.py
+- All error boundary functionality verified:
+  * Component catches React errors in component tree
+  * App doesn't crash completely when errors occur
+  * Friendly fallback UI displayed
+  * Error logging works for debugging
+
+**Test #51: User-Friendly Timestamp Formatting**
+- Created lib/format-date.ts with intelligent timestamp formatting
+  * formatTimestamp(): Main utility function
+  * Relative time for recent measurements (< 24 hours):
+    - "just now" for < 1 minute
+    - "X minutes ago" for < 1 hour
+    - "X hours ago" for < 24 hours
+  * Formatted date with timezone for older measurements:
+    - Example: "Jan 15, 2024 8:00 AM CST"
+    - Includes month (short), day, year, time, and timezone
+  * getRelativeTime(): Helper for testing/display
+- Updated components/BottomSheet.tsx
+  * Replaced toLocaleString() with formatTimestamp()
+  * Applied to "Measured" field in marker details
+- Updated components/SnowfallMap.tsx
+  * Replaced toLocaleString() with formatTimestamp()
+  * Applied to desktop popup timestamp display
+- Tested with test_timestamps.py
+- Both mobile (bottom sheet) and desktop (popup) displays verified
+
+**Test Status:** 46/101 passing (45.5% complete, 55 remaining)
+**Tests Fixed:** #43 (Error boundary), #51 (User-friendly timestamps)
+
+**Key Implementation Details:**
+- Error boundary follows React best practices with class component
+- Timestamp formatting provides better UX with relative time
+- Consistent formatting across mobile and desktop
+- All changes properly tested with browser automation
+
+**Session Summary:**
+- Completed 3 features total in Session 19:
+  * Test #44: 404 page
+  * Test #43: Error boundary
+  * Test #51: Timestamp formatting
+- Improved port configuration in init.sh
+- Updated CLAUDE.md with uv requirement
+
+===========================================
+Session 19 complete - 3 features implemented
+===========================================
