@@ -131,12 +131,17 @@ When asked to do something, just do it - including obvious follow-up actions nee
 ## Testing
 
 - ALL TEST FAILURES ARE YOUR RESPONSIBILITY, even if they're not your fault. The Broken Windows theory is real.
-- Never delete a test because it's failing. Instead, raise the issue with Kyle. 
-- Tests MUST comprehensively cover ALL functionality. 
+- Never delete a test because it's failing. Instead, raise the issue with Kyle.
+- Tests MUST comprehensively cover ALL functionality.
 - YOU MUST NEVER write tests that "test" mocked behavior. If you notice tests that test mocked behavior instead of real logic, you MUST stop and warn Kyle about them.
 - YOU MUST NEVER implement mocks in end to end tests. We always use real data and real APIs.
 - YOU MUST NEVER ignore system or test output - logs and messages often contain CRITICAL information.
 - Test output MUST BE PRISTINE TO PASS. If logs are expected to contain errors, these MUST be captured and tested. If a test is intentionally triggering an error, we *must* capture and validate that the error output is as we expect
+
+## Browser Automation
+
+- YOU MUST use `uv` for all Python environment setup and package management for browser automation tests
+- Use `.venv/bin/python` to run test scripts after setting up with uv
 
 ## Documentation
 - Make sure to update relevant documentation (markdown files) after making changes that differ from the documentation. You should also update documentation if a new feature is added. Ask Kyle if your unsure whether or not the change warrents a documentation update. 
