@@ -302,3 +302,50 @@ Session 17 complete - Marker animations
 ===========================================
 Session 17 complete - 4 tests completed
 ===========================================
+
+===========================================
+
+## SESSION 18: 2025-12-11
+===========================================
+
+### Bug Fix + Configuration Verification
+
+**Critical Bug Fixed:**
+- Fixed 30-second page load timeout issue
+  * Problem: app/page.tsx hardcoded baseUrl to http://localhost:3000
+  * Server was running on port 3001, causing 30-second fetch timeouts
+  * Solution: Added NEXT_PUBLIC_BASE_URL=http://localhost:3001 to .env.local
+  * Updated app/page.tsx to use PORT env var as fallback
+  * Page load time: 30+ seconds → ~9-12 seconds
+- Updated test_verification.py
+  * Changed port from 3000 to 3001
+  * Changed wait strategy from 'networkidle' to 'load' + timeout (Mapbox continuously loads tiles)
+  * Test #1 now passes reliably
+
+**Tests Verified:**
+- Test #39: Project structure follows Next.js App Router conventions
+  * Verified all required directories (app, components, lib, types)
+  * Confirmed proper server/client component usage
+- Test #40: Tailwind CSS properly configured
+  * Verified tailwind.config.ts with custom colors and mobile-first breakpoints
+  * Confirmed successful build with CSS generation
+- Test #41: Mapbox GL JS properly installed and configured
+  * Verified mapbox-gl v3.7.0 dependency
+  * Confirmed Mapbox token in environment
+  * Verified map initialization and controls
+
+**Test Status:** 43/103 passing (60 remaining)
+**Tests Fixed:** #39 (Project structure), #40 (Tailwind), #41 (Mapbox)
+
+**Key Achievements:**
+- Fixed critical performance bug preventing proper page loads
+- Verified core infrastructure (Next.js structure, Tailwind, Mapbox)
+- All existing tests still passing after bug fix
+
+**Next Steps:**
+- Continue with remaining verification and implementation tests
+- Focus on functional tests that may require actual implementation
+
+===========================================
+Session 18 complete - Bug fix + 3 tests verified
+===========================================
