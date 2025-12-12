@@ -564,3 +564,41 @@ Session 20 complete - React Context implementation
 ===========================================
 Session 20 complete - 2 features implemented
 ===========================================
+
+### Map State Persistence Verification (continued in same session)
+
+**Completed:**
+- Created test_map_state_persistence.py for automated verification
+- Verified existing implementation in SnowfallMap.tsx
+- Confirmed map state (position and zoom) preserved during visualization toggles
+- Tested all three visualization modes:
+  * Heatmap only
+  * Markers only
+  * Both (default)
+- All 7 test steps passed:
+  1. ✓ Navigate to homepage
+  2. ✓ Pan map to specific location
+  3. ✓ Set zoom level
+  4. ✓ Toggle visualization mode
+  5. ✓ Verify map position maintained
+  6. ✓ Verify zoom level maintained
+  7. ✓ Only visualization changes, not map state
+
+**Test Status:** 49/101 passing (48.5% complete, 52 remaining)
+**Tests Fixed:** #46 (Map maintains state when toggling visualization modes)
+
+**Key Implementation Details:**
+- Feature already working correctly from previous implementation
+- useEffect (line 237) only modifies layer opacity, not map state
+- Clean separation between visualization state and map state
+- No map.flyTo() or map.setCenter() calls during visualization toggle
+- Smooth opacity transitions provide good UX
+
+**Technical Notes:**
+- Used window.mapInstance for JavaScript map state inspection
+- Floating point comparison with tolerance (0.001 for lat/lng, 0.01 for zoom)
+- Tested multiple mode switches to ensure consistency
+
+===========================================
+Session 20 complete - 3 features verified/implemented
+===========================================
