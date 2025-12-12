@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { StormMetadata } from '@/types';
 import { cache } from '@/lib/cache';
 import { fetchAllNoaaSnowfall } from '@/lib/noaa-client';
+import { internalServerError } from '@/lib/api-error';
 
 const CACHE_KEY = 'storms:list';
 
@@ -59,19 +60,6 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error in /api/storms:', error);
-
-    return NextResponse.json(
-      {
-        error: 'Failed to fetch storm list',
-        message: error instanceof Error ? error.message : 'Unknown error',
-      },
-      {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    return internalServerError(error);
   }
 }

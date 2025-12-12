@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { SnowfallEvent } from '@/types';
 import { cache } from '@/lib/cache';
 import { fetchAllNoaaSnowfall } from '@/lib/noaa-client';
+import { badRequestError, notFoundError, internalServerError } from '@/lib/api-error';
 
 /**
  * GET handler for /api/snowfall/[stormId]
@@ -19,13 +20,7 @@ export async function GET(
 
     // Validate stormId format (should be like "storm-2025-12-04")
     if (!stormId || !stormId.match(/^storm-\d{4}-\d{2}-\d{2}$/)) {
-      return NextResponse.json(
-        {
-          error: 'Invalid storm ID',
-          message: 'Storm ID must be in format: storm-YYYY-MM-DD',
-        },
-        { status: 404 }
-      );
+      return badRequestError('Storm ID must be in format: storm-YYYY-MM-DD');
     }
 
     // Check cache first
@@ -43,13 +38,7 @@ export async function GET(
     // Extract date from stormId
     const dateMatch = stormId.match(/storm-(\d{4})-(\d{2})-(\d{2})/);
     if (!dateMatch) {
-      return NextResponse.json(
-        {
-          error: 'Invalid storm ID format',
-          message: 'Could not parse date from storm ID',
-        },
-        { status: 404 }
-      );
+      return badRequestError('Could not parse date from storm ID');
     }
 
     const [, year, month, day] = dateMatch;
@@ -58,13 +47,7 @@ export async function GET(
     // Verify the storm date is not in the future
     const now = new Date();
     if (stormDate > now) {
-      return NextResponse.json(
-        {
-          error: 'Storm not found',
-          message: 'Storm date is in the future',
-        },
-        { status: 404 }
-      );
+      return notFoundError('Storm date is in the future');
     }
 
     // Fetch snowfall data for this storm
@@ -89,19 +72,6 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error('Error in /api/snowfall/[stormId]:', error);
-
-    return NextResponse.json(
-      {
-        error: 'Failed to fetch storm data',
-        message: error instanceof Error ? error.message : 'Unknown error',
-      },
-      {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    return internalServerError(error);
   }
 }

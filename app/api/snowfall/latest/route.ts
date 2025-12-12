@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { SnowfallEvent } from '@/types';
 import { fetchAllNoaaSnowfall } from '@/lib/noaa-client';
 import { cache } from '@/lib/cache';
+import { internalServerError } from '@/lib/api-error';
 
 const CACHE_KEY = 'snowfall:latest';
 
@@ -49,19 +50,6 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error in /api/snowfall/latest:', error);
-
-    return NextResponse.json(
-      {
-        error: 'Failed to fetch snowfall data',
-        message: error instanceof Error ? error.message : 'Unknown error',
-      },
-      {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    return internalServerError(error);
   }
 }
