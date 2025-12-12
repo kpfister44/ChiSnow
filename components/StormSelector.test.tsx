@@ -1,10 +1,11 @@
 // ABOUTME: Test suite for StormSelector component
 // ABOUTME: Verifies storm selection dropdown functionality
 
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { SnowfallProvider } from '@/lib/contexts/SnowfallContext';
 import StormSelector from './StormSelector';
-import type { StormMetadata } from '@/types';
+import type { StormMetadata, SnowfallEvent } from '@/types';
 
 const mockStorms: StormMetadata[] = [
   {
@@ -21,28 +22,28 @@ const mockStorms: StormMetadata[] = [
   },
 ];
 
+const mockData: SnowfallEvent = {
+  stormId: 'storm-2025-12-04',
+  date: '2025-12-04T20:00:00.000Z',
+  measurements: [],
+};
+
 describe('StormSelector', () => {
   it('renders the currently selected storm', () => {
-    const onStormChange = vi.fn();
     render(
-      <StormSelector
-        storms={mockStorms}
-        selectedStormId="storm-2025-12-04"
-        onStormChange={onStormChange}
-      />
+      <SnowfallProvider initialData={mockData} storms={mockStorms}>
+        <StormSelector />
+      </SnowfallProvider>
     );
 
     expect(screen.getByRole('heading', { name: /Dec 4, 2025/i })).toBeInTheDocument();
   });
 
   it('displays storm metadata', () => {
-    const onStormChange = vi.fn();
     render(
-      <StormSelector
-        storms={mockStorms}
-        selectedStormId="storm-2025-12-04"
-        onStormChange={onStormChange}
-      />
+      <SnowfallProvider initialData={mockData} storms={mockStorms}>
+        <StormSelector />
+      </SnowfallProvider>
     );
 
     expect(screen.getByText(/10" max/)).toBeInTheDocument();

@@ -9,6 +9,7 @@ import { Delaunay } from 'd3-delaunay';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import type { SnowfallEvent } from '@/types';
 import { formatTimestamp } from '@/lib/format-date';
+import { useSnowfall } from '@/lib/contexts/SnowfallContext';
 
 declare global {
   interface Window {
@@ -17,18 +18,6 @@ declare global {
 }
 
 type VisualizationMode = 'heatmap' | 'markers' | 'both';
-
-interface SnowfallMapProps {
-  data: SnowfallEvent;
-  onMarkerClick?: (markerData: {
-    station: string;
-    amount: number;
-    source: string;
-    timestamp: string;
-    lat: number;
-    lon: number;
-  }) => void;
-}
 
 // Color mapping for snowfall amounts
 function getSnowfallColor(amount: number): string {
@@ -120,7 +109,8 @@ function createVoronoiPolygons(measurements: SnowfallEvent['measurements'], boun
   return features;
 }
 
-export default function SnowfallMap({ data, onMarkerClick }: SnowfallMapProps) {
+export default function SnowfallMap() {
+  const { snowfallData: data, setSelectedMarker } = useSnowfall();
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [vizMode, setVizMode] = useState<VisualizationMode>('both');
@@ -509,16 +499,14 @@ export default function SnowfallMap({ data, onMarkerClick }: SnowfallMapProps) {
         if (!props) return;
 
         // Trigger callback for mobile bottom sheet
-        if (onMarkerClick) {
-          onMarkerClick({
-            station: props.station,
-            amount: props.amount,
-            source: props.source,
-            timestamp: props.timestamp,
-            lat: coordinates[1],
-            lon: coordinates[0]
-          });
-        }
+        setSelectedMarker({
+          station: props.station,
+          amount: props.amount,
+          source: props.source,
+          timestamp: props.timestamp,
+          lat: coordinates[1],
+          lon: coordinates[0]
+        });
 
         // Show popup on desktop only (>1024px)
         if (window.innerWidth >= 1024) {

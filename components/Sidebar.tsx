@@ -3,22 +3,11 @@
 
 'use client';
 
+import { useSnowfall } from '@/lib/contexts/SnowfallContext';
 import StormSelector from './StormSelector';
-import type { StormMetadata, SnowfallEvent } from '@/types';
 
-interface SidebarProps {
-  storms: StormMetadata[];
-  selectedStormId: string;
-  onStormChange: (stormId: string) => void;
-  snowfallData: SnowfallEvent;
-}
-
-export default function Sidebar({
-  storms,
-  selectedStormId,
-  onStormChange,
-  snowfallData
-}: SidebarProps) {
+export default function Sidebar() {
+  const { snowfallData } = useSnowfall();
   // Calculate aggregate statistics
   const totalStations = snowfallData.measurements.length;
   const maxSnowfall = Math.max(...snowfallData.measurements.map(m => m.amount));
@@ -33,11 +22,7 @@ export default function Sidebar({
     <div className="hidden md:flex md:flex-col w-[300px] bg-white border-r border-gray-200 h-screen">
       {/* Storm Selector */}
       <div className="p-6 border-b border-gray-200">
-        <StormSelector
-          storms={storms}
-          selectedStormId={selectedStormId}
-          onStormChange={onStormChange}
-        />
+        <StormSelector />
       </div>
 
       {/* Aggregate Statistics */}

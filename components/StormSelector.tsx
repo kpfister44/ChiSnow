@@ -3,13 +3,7 @@
 
 'use client';
 
-import type { StormMetadata } from '@/types';
-
-interface StormSelectorProps {
-  storms: StormMetadata[];
-  selectedStormId: string;
-  onStormChange: (stormId: string) => void;
-}
+import { useSnowfall } from '@/lib/contexts/SnowfallContext';
 
 function formatDate(dateString: string): string {
   const date = new Date(dateString);
@@ -20,11 +14,8 @@ function formatDate(dateString: string): string {
   });
 }
 
-export default function StormSelector({
-  storms,
-  selectedStormId,
-  onStormChange
-}: StormSelectorProps) {
+export default function StormSelector() {
+  const { storms, selectedStormId, handleStormChange } = useSnowfall();
   const selectedStorm = storms.find(storm => storm.id === selectedStormId);
 
   if (!selectedStorm) {
@@ -47,7 +38,7 @@ export default function StormSelector({
         {storms.length > 1 && (
           <select
             value={selectedStormId}
-            onChange={(e) => onStormChange(e.target.value)}
+            onChange={(e) => handleStormChange(e.target.value)}
             className="px-3 py-3 md:py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             {storms.map((storm) => (

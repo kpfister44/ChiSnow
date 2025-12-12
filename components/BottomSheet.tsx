@@ -5,6 +5,7 @@
 
 import { useEffect, useRef } from 'react';
 import { formatTimestamp } from '@/lib/format-date';
+import { useSnowfall } from '@/lib/contexts/SnowfallContext';
 
 export interface MarkerData {
   station: string;
@@ -15,12 +16,9 @@ export interface MarkerData {
   lon: number;
 }
 
-interface BottomSheetProps {
-  data: MarkerData | null;
-  onClose: () => void;
-}
-
-export default function BottomSheet({ data, onClose }: BottomSheetProps) {
+export default function BottomSheet() {
+  const { selectedMarker: data, setSelectedMarker } = useSnowfall();
+  const onClose = () => setSelectedMarker(null);
   const sheetRef = useRef<HTMLDivElement>(null);
   const startY = useRef<number>(0);
   const currentY = useRef<number>(0);
