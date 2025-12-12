@@ -656,7 +656,7 @@
       "Step 6: Verify zoom level is maintained",
       "Step 7: Only visualization changes, not map state"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
